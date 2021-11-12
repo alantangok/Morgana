@@ -1,6 +1,6 @@
-Delta = (function() {
+var Delta = function(morganaId) {
 
-  'use strict'
+    'use strict';
 
   //===============================================================================================
   // CONSTANTS
@@ -18,7 +18,7 @@ var HEIGHT = Math.max(
       // WIDTH    = 1024,
       // HEIGHT   = 768,
       RATIO    = WIDTH/HEIGHT,
-      HITBOX   = 5,
+      HITBOX   = 1,
       COOLDOWN = 15,
       jumpCOOLDOWN = 1,
       pressedUp = false,
@@ -54,7 +54,7 @@ var HEIGHT = Math.max(
       { id: "rocks",   url: "images/rocks.png"   },
       { id: "bullets", url: "images/bullets.png" },
       { id: "player", url: "images/bullets.png" },
-      { id: "player1", url: "images/player1.png" },
+      { id: "player1", url: "images/morgana/"+morganaId+".png" },
       { id: "bg_Mo_fair", url: "images/bg_Mo_fair.png" },
       { id: "bg_Mo_middle", url: "images/bg_Mo_middle.png" },
       { id: "bg_Mo_close", url: "images/bg_Mo_close.png" },
@@ -554,8 +554,10 @@ var HEIGHT = Math.max(
       this.dead = true;
       this.setLives(this.lives-1);
       this.anim.frame = 0;
-      if (!this.lives)
-        setTimeout(engine.quit.bind(engine), 4000);
+      if (!this.lives){
+          updateScore(this.score);
+          setTimeout(engine.quit.bind(engine), 4000);
+      }
     }
 
   });
@@ -969,12 +971,13 @@ var HEIGHT = Math.max(
         this.ctx.drawImage(playerCanvas, 0, 0, frame.w, frame.h,
                                                 player.x + (dt * player.dx), player.y + (dt * player.dy), player.w, player.h);
 
-        if ((player.movingUp || player.movingDown || player.movingLeft || player.movingRight) && !player.jumpCOOLDOWN) {
-          sprite = player.thrust.sprite;
-          frame  = sprite.frames[player.thrust.anim.frame];
-          this.ctx.drawImage(this.images.sprites, frame.x, frame.y, frame.w, frame.h,
-                                                  player.x + (dt * player.dx) - player.w, player.y + (dt * player.dy), player.w, player.h);
-        }
+        // jump effect
+        // if ((player.movingUp || player.movingDown || player.movingLeft || player.movingRight) && !player.jumpCOOLDOWN) {
+        //   sprite = player.thrust.sprite;
+        //   frame  = sprite.frames[player.thrust.anim.frame];
+        //   this.ctx.drawImage(this.images.sprites, frame.x, frame.y, frame.w, frame.h,
+        //                                           player.x + (dt * player.dx) - player.w, player.y + (dt * player.dy), player.w, player.h);
+        // }
       }
 
     },
@@ -999,7 +1002,6 @@ var HEIGHT = Math.max(
         if (rock.enabled) {
           sprite = rocks.sprite;
           frame  = sprite.frames[rocks.anim.frame];
-          console.log(rocks.anim.frame);
           this.ctx.drawImage(this.images.rocks, frame.x, rock.top? frame.y: frame.y + 32, frame.w, frame.h,
                                                 rock.x + (dt * rock.dx), rock.y, rock.w, rock.h);
 
@@ -1284,7 +1286,9 @@ var HEIGHT = Math.max(
     run.stars    = stars;
     run.renderer = renderer;
 
-  return run;
+    run();
+
+    return run;
   //-----------------------------------------------------------------------------------------------
 
-}());
+};
