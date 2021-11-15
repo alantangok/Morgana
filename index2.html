@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8"/>
+    <link rel="icon" href="/favicon.ico"/>
+    <meta name="viewport" content="width=device-width,initial-scale=0.75, maximum-scale=0.75, user-scalable=no"/>
+    <meta name="theme-color" content="#000000"/>
+    <meta
+            name="description"
+            content="Web site created using create-react-app"
+    />
+    <link rel="apple-touch-icon" href="/logo192.png"/>
+    <link rel="manifest" href="/manifest.json"/>
+    <title>Morgana Free Mint</title>
+
+    <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+    <meta http-equiv="Content-type" content="text/html; charset=utf-8"/>
+    <link href='http://fonts.googleapis.com/css?family=Orbitron:400,500,700,900' rel='stylesheet' type='text/css'>
+    <link href="css/normalize.css" media="screen, print" rel="stylesheet" type="text/css"/>
+    <link href="css/delta.css" media="screen, print" rel="stylesheet" type="text/css"/>
+    <link href="static/css/main.92d85df4.chunk.css" rel="stylesheet"/>
+    <title>Javascript Delta</title>
+
+    <style type="text/css">
+        /* Font */
+        @import url("https://fonts.googleapis.com/css?family=Quicksand:400,700");
+
+        /* Design */
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+        }
+
+        .main {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            font-size: 24px;
+            font-weight: 400;
+            text-align: center;
+        }
+
+        .main a {
+            color: #fff;
+        }
+
+        img {
+            height: auto;
+            max-width: 100%;
+            vertical-align: middle;
+        }
+
+        .btn {
+            color: #ffffff;
+            padding: 0.8rem;
+            font-size: 14px;
+            text-transform: uppercase;
+            border-radius: 4px;
+            font-weight: 400;
+            display: block;
+            width: 100%;
+            cursor: pointer;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            background: transparent;
+        }
+
+        .btn:hover {
+            background-color: rgba(255, 255, 255, 0.12);
+        }
+
+        .cards {
+            display: flex;
+            flex-wrap: wrap;
+            list-style: none;
+            margin: 0;
+            padding: 0;
+        }
+
+        .cards_item {
+            display: flex;
+            padding: 1rem;
+        }
+
+        @media (min-width: 40rem) {
+            .cards_item {
+                width: 50%;
+            }
+        }
+
+        @media (min-width: 56rem) {
+            .cards_item {
+                width: 33.3333%;
+            }
+        }
+
+        .card {
+            background-color: white;
+            border-radius: 0.25rem;
+            box-shadow: 0 20px 40px -14px rgba(0, 0, 0, 0.25);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .card_content {
+            padding: 1rem;
+            background: linear-gradient(to bottom left, #ef8d9c 40%, #ffc39e 100%);
+        }
+
+        .card_title {
+            color: #ffffff;
+            font-size: 1.1rem;
+            font-weight: 700;
+            letter-spacing: 1px;
+            text-transform: capitalize;
+            margin: 0px;
+            font-family: 微軟正黑體;
+        }
+
+        .card_text {
+            color: #ffffff;
+            font-size: 0.875rem;
+            line-height: 1.5;
+            margin-bottom: 1.25rem;
+            font-weight: 400;
+            font-family: 微軟正黑體;
+        }
+
+        .made_by {
+            font-weight: 400;
+            font-size: 13px;
+            margin-top: 35px;
+            text-align: center;
+        }
+    </style>
+
+</head>
+
+<body>
+
+<!-- The Modal -->
+<div class="modal" id="charaterSelector">
+    <div class="modal-dialog">
+        <div class="modal-content">
+
+            <!-- Modal Header -->
+            <div class="modal-header">
+                <h4 class="modal-title">Choose your Morgana</h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+
+            <!-- Modal body -->
+            <div class="modal-body">
+
+                <div class="main">
+
+                    <ul class="cards">
+
+                    </ul>
+                </div>
+
+            </div>
+
+            <!-- Modal footer -->
+            <div class="modal-footer">
+                <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Close</button>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<!-- The Modal -->
+<div class="modal" id="scoreLeaderboard">
+    <div class="modal-dialog">
+        <div class="modal-content">
+
+            <!-- Modal Header -->
+            <div class="modal-header">
+                <h4 class="modal-title">Leaderboard</h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+
+            <!-- Modal body -->
+            <div class="modal-body">
+
+                <div class="main">
+
+                    <ul class="cards">
+
+                    </ul>
+                </div>
+
+            </div>
+
+            <!-- Modal footer -->
+            <div class="modal-footer">
+                <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Close</button>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<noscript>You need to enable JavaScript to run this app.</noscript>
+<div id="root"></div>
+
+<div id="delta">
+
+    <div id="scoreboard">
+        <span class="lives"><span class="label">LIVES:</span><img class="one" src="images/life.png"><img class="two"
+                                                                                                         src="images/life.png"><img
+                class="three" src="images/life.png"></span>
+        <span class="score"><span class="label">SCORE:</span><span class="value">00000</span></span>
+    </div>
+
+    <img id="booting" src='images/booting.gif'>
+
+    <h1 id="title" style="display:none;">Morgana</h1>
+    <h2 id="start" style="display:none;">press "spacebar"</h2>
+    <h1 id="prepare" style="display:none;">Go for fight!</h1>
+
+    <canvas id="canvas">
+        <div class="unsupported">
+            Sorry, this example cannot be run because your browser does not support the &lt;canvas&gt; element
+        </div>
+    </canvas>
+
+    <div id="instructions">
+
+    </div>
+
+    <div id='sound' class='on' title='toggle music and fx' style="display:none;"></div>
+
+</div>
+
+<script
+        src="https://code.jquery.com/jquery-3.6.0.min.js"
+        integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4="
+        crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"
+        integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
+        crossorigin="anonymous"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"
+        integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
+        crossorigin="anonymous"></script>
+<script>var jq = $.noConflict();</script>
+
+<script src="js/vendor.js"></script>
+<script src="js/game.js"></script>
+<script src="js/delta.js"></script>
+<script>
+</script>
+
+
+<script>
+    var walletAddress = "";
+    var appendedList = [];
+    var runnging = false;
+
+    function chooseCh() {
+        jq.ajax({
+            method: "POST",
+            url: "api/getNFTMetadata.php",
+            data: {
+                addressArray: JSON.stringify(nftAccounts)
+            }
+        })
+            .done(function (data) {
+                var imagesList = JSON.parse(data);
+                jq(imagesList).each(function (index, element) {
+                    if (appendedList.indexOf(element.id) == -1) {
+                        jq('#charaterSelector .cards').append('<li class="cards_item">\n' +
+                            '                            <a href="#" data-id="' + element.id + '">\n' +
+                            '                                <div class="card">\n' +
+                            '                                    <div class="card_image">\n' +
+                            '                                        <img src="images/morgana/' + element.id + '.png"/>\n' +
+                            '                                    </div>\n' +
+                            '\n' +
+                            '                                    <div class="card_content">\n' +
+                            '                                        <h2 class="card_title"></h2>\n' +
+                            '                                    </div>\n' +
+                            '                                </div>\n' +
+                            '                            </a>\n' +
+                            '                        </li>')
+
+                    }
+                    appendedList.push(element.id);
+                    console.log(appendedList);
+                });
+
+                jq('#charaterSelector').modal('show');
+                jq('.cards_item a').on('click', function (event) {
+                    morganaId = jq(event.target).parents('a').data("id")
+                    enterGame(morganaId)
+                    jq('#charaterSelector').modal('hide');
+                });
+            });
+
+
+    }
+
+    function enterGame(morganaId) {
+        document.getElementById('root').style.display = 'none';
+        document.getElementById('delta').style.display = 'flex';
+        if (!runnging) {
+            Delta(morganaId);
+            runnging = true;
+        }
+    }
+
+    function updateScore(score) {
+        jq.ajax({
+            method: "POST",
+            url: "api/updateScore.php",
+            data: {
+                score: JSON.stringify(nftAccounts),
+                wallet:
+            }
+        })
+            .done(function (data) {
+            });
+
+
+    }
+
+
+    function getScore() {
+
+    }
+
+    function showScore() {
+
+    }
+</script>
+
+<script src="/static/js/2.46a1626c.chunk.js"></script>
+<script src="/static/js/main.23442927.chunk.js"></script>
+
+</body>
+</html>

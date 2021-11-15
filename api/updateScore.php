@@ -2,71 +2,64 @@
 ini_set('memory_limit', '1024M');
 
 // database
-define('mysql_servername', 'localhost');
-define('mysql_dbname', 'morgana_game');
-define('mysql_prefix', '');
-define('mysql_username', 'morgana_game');
-define('mysql_password', 'Lfe85XiCMYQJ6a');
-
-require "./mintsList.php";
-
+require './config/config.php';
 
 unset($data);
 
 $conn = mysqlConnect();
 
+$score = getgpc('score');
 $walletAddress = getgpc('walletAddress');
 
-$rs = mysqlQuery("SELECT * FROM contest_leaderboard WHERE mintAddress = '{$walletAddress}'");
+if($walletAddress === 'guest'){
+    die();
+}
+
+$sqlQuery = sqlUpdateOrInsert('contest_record', [
+    'walletAddress' => getgpc('walletAddress'),
+    'gamingDuration' => intval(getgpc('gamingDuration')),
+    'score' => intval(getgpc('score')),
+    'enemyKill' => intval(getgpc('enemyKill')),
+    'ip' => getUserIP(),
+]);
+
+$rs = mysqlQuery($sqlQuery);
+
+if ($rs->result === true) {
+    echo 'db ok';
+} else {
+    echo 'db fail';
+}
+
+$rs = mysqlQuery("SELECT * FROM contest_leaderboard WHERE walletAddress = '{$walletAddress}'");
 
 if ($rs->result->num_rows > 0) {
     $row = mysqli_fetch_all($rs->result, MYSQLI_ASSOC)[0];
+    $highestScore = $row['highestScore'];
+}else{
+    $highestScore = 0;
+}
 
-    if (intval(getgpc('score')) > intval($row['highestScore'])) {
+if (intval(getgpc('score')) >= intval($highestScore)) {
 
-        $sqlQuery = sqlUpdateOrInsert('contest_leaderboard', array(
-            'walletAddress' => getgpc('walletAddress'),
-            'highestScore' => intval(getgpc('score')),
-            'highestNFTAddress' => getgpc('highestNFTAddress'),
-            'ip' => getUserIP(),
-            'enemyKill' => intval(getgpc('enemyKill')),
-            'gamingDuration' => intval(getgpc('gamingDuration')),
+    $sqlQuery = sqlUpdateOrInsert('contest_leaderboard', [
+        'walletAddress' => getgpc('walletAddress'),
+        'highestScore' => intval(getgpc('score')),
+        'highestNFTAddress' => getgpc('highestNFTAddress'),
+        'ip' => getUserIP(),
+        'enemyKill' => intval(getgpc('enemyKill')),
+        'gamingDuration' => intval(getgpc('gamingDuration')),
+    ]);
 
-        ));
+    $rs = mysqlQuery($sqlQuery);
 
-        $rs = mysqlQuery($sqlQuery);
-
-        if ($rs->result === true) {
-            echo 'db ok';
-        } else {
-            echo 'db fail';
-        }
-
+    if ($rs->result === true) {
+        echo 'db ok';
+    } else {
+        echo 'db fail';
     }
 
 
-}
-
-
-function getPage2($url)
-{
-    $ch = curl_init();
-    curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 30);
-    curl_setopt($ch, CURLOPT_USERAGENT, 'Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1)');
-    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
-    curl_setopt($ch, CURLOPT_FOLLOWLOCATION, 1);
-//    curl_setopt($ch, CURLOPT_COOKIEJAR, $COOKIEFILE);
-//    curl_setopt($ch, CURLOPT_COOKIEFILE, $COOKIEFILE);
-    curl_setopt($ch, CURLOPT_HEADER, 0);
-    curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-    curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 120);
-    curl_setopt($ch, CURLOPT_TIMEOUT, 120);
-
-    curl_setopt($ch, CURLOPT_URL, $url);
-    $data = curl_exec($ch);
-
-    return $data;
 }
 
 function mysqlConnect()

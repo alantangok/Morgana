@@ -2,11 +2,7 @@
 ini_set('memory_limit', '1024M');
 
 // database
-define('mysql_servername', 'localhost');
-define('mysql_dbname', 'morgana_game');
-define('mysql_prefix', '');
-define('mysql_username', 'morgana_game');
-define('mysql_password', 'Lfe85XiCMYQJ6a');
+require './config/config.php';
 
 $conn = mysqlConnect();
 if(isJSON(less_getgpc('addressArray'))){

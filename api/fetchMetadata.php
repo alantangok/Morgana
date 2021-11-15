@@ -1,17 +1,21 @@
 <?php
 ini_set('memory_limit', '1024M');
+ini_set('max_execution_time', 0);
 
 // database
-define('mysql_servername', 'localhost');
-define('mysql_dbname', 'morgana_game');
-define('mysql_prefix', '');
-define('mysql_username', 'morgana_game');
-define('mysql_password', 'Lfe85XiCMYQJ6a');
-
+require './config/config.php';
 require "./mintsList.php";
+
+$addMode = true;
 
 foreach ($NFTMintsList as $address) {
     unset($data);
+
+    $rs = mysqlQuery("SELECT * FROM nft_raw_data WHERE mintAddress = '{$address}'");
+
+    if ($rs->result->num_rows > 0 & $addMode === true) {
+        continue;
+    }
 
     $data = getPage2('https://api-mainnet.magiceden.io/rpc/getNFTByMintAddress/' . $address);
     $metadata_parsed = json_decode($data);

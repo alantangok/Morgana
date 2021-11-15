@@ -5,14 +5,22 @@ var Delta = function(morganaId) {
   //===============================================================================================
   // CONSTANTS
   //===============================================================================================
-var WIDTH = Math.max(document.documentElement.clientWidth || 0, window.innerWidth || 0);
-var HEIGHT = Math.max(
-  document.documentElement.clientHeight || 0,
-  window.innerHeight || 0
-);
+var cWIDTH = window.innerWidth
+        || document.documentElement.clientWidth
+        || document.body.clientWidth;
 
- WIDTH = HEIGHT /16*9;
+var cHEIGHT = window.innerHeight
+    || document.documentElement.clientHeight
+    || document.body.clientHeight;
 
+var HEIGHT = cHEIGHT;
+var WIDTH = HEIGHT /16*9;
+
+if (cWIDTH > WIDTH){
+    document.getElementById("scoreboard").style.width = WIDTH + "px";
+}else{
+    WIDTH = cWIDTH;
+}
 
   var FPS      = 60,
       // WIDTH    = 1024,
@@ -29,10 +37,11 @@ var HEIGHT = Math.max(
       GRAVITY  = 10,
       PLAYER   = { X: 50, Y: 150, W: 128,  H: 128, BULLET_SPEED: 1000 },
       ALIEN    = {                W: 32,  H: 32, BULLET_SPEED: { MIN: 400, MAX: 800 } },
-      ROCK     = {                W: 256, H: 128, DX: -500 }
+      ROCK     = {                W: 256, H: 128, DX: -500 },
+      playerCanvas, playerCtx
 
 
-      document.getElementById("delta").style.width = WIDTH+"px";
+      document.getElementById("delta").style.width = WIDTH + "px";
       document.getElementById("delta").style.height = HEIGHT + "px";
 
       console.log(WIDTH);
@@ -46,7 +55,7 @@ var HEIGHT = Math.max(
 
   var cfg = {
 
-    fpsmeter: { anchor: 'delta', decimals: 0, graph: true, heat: true, theme: 'dark', left: 'auto', right: '-120px' },
+    // fpsmeter: { anchor: 'delta', decimals: 0, graph: true, heat: true, theme: 'dark', left: 'auto', right: '-120px' },
 
     images: [
       { id: "sprites", url: "images/sprites.png" },
@@ -62,9 +71,9 @@ var HEIGHT = Math.max(
     ],
 
     sounds: [
-      { id: "title",   name: "sounds/title",   formats: ['mp3'], volume: 0.4,  loop: true },
-      { id: "game",    name: "sounds/game",    formats: ['mp3'], volume: 0.5,  loop: true },
-      { id: "shoot",   name: "sounds/shoot",   formats: ['mp3'], volume: 0.04, pool: 5 },
+      { id: "title",   name: "sounds/title",   formats: ['mp3'], volume: 1,  loop: true },
+      { id: "game",    name: "sounds/game",    formats: ['mp3'], volume: 0.25,  loop: true },
+      { id: "shoot",   name: "sounds/shoot",   formats: ['mp3'], volume: 0.03, pool: 5 },
       { id: "explode", name: "sounds/explode", formats: ['mp3'], volume: 0.10, pool: 5 }
     ],
 
@@ -94,17 +103,26 @@ var HEIGHT = Math.max(
     ],
 
     stars: [
-      { x: 0, y: 0, speed: { min:   0, max:   0 }, image: "bg_Mo_fair" }, // 1 in 3 get a tint of red
-      {  x: 0, y: 0, speed: { min:   0, max:   0 }, image: "bg_Mo_fair" }, // 1 in 3 get a tint of red
+      { x: -(1052/2-WIDTH/2), y: 0, speed: { min:   0, max:   0 }, image: "bg_Mo_fair" }, // 1 in 3 get a tint of red
       {  x: 0, y: 0, speed: { min:   16, max:  16 }, image: "bg_Mo_middle" },
-      {  x: WIDTH, y: 0, speed: { min:   16, max:  16 }, image: "bg_Mo_middle" },
+      {  x: 1052, y: 0, speed: { min:   16, max:  16 }, image: "bg_Mo_middle" },
       {  x: 0, y: 0, speed: { min: 64, max: 64 }, image: "bg_Mo_close" },
-      {  x: WIDTH, y: 0, speed: { min: 64, max: 64 }, image: "bg_Mo_close" },
+      {  x: 1052, y: 0, speed: { min: 64, max: 64 }, image: "bg_Mo_close" },
     ],
 
     sprites: {
 
       player: { fps: 20, frames: [
+                                  { x: 0, y: 0, w: 101, h: 101 },
+                                  { x: 0, y: 0, w: 101, h: 101 },
+                                  { x: 0, y: 0, w: 101, h: 101 },
+                                  { x: 0, y: 0, w: 101, h: 101 },
+                                  { x: 0, y: 0, w: 101, h: 101 },
+                                  { x: 0, y: 0, w: 101, h: 101 },
+                                  { x: 0, y: 0, w: 101, h: 101 },
+                                  { x: 0, y: 0, w: 101, h: 101 },
+                                  { x: 0, y: 0, w: 101, h: 101 },
+                                  { x: 0, y: 0, w: 101, h: 101 },
                                   { x: 0, y: 0, w: 101, h: 101 },
                                   { x: 0, y: 0, w: 101, h: 101 },
                                   { x: 0, y: 0, w: 101, h: 101 },
@@ -156,7 +174,7 @@ var HEIGHT = Math.max(
                                    { x: 167, y: 18, w: 32, h: 32 },
                                    { x: 134, y: 18, w: 32, h: 32 } ] },
 
-      alien1: { fps: 5, frames: [
+      alien1: { fps: 5, frames: [ //phantam
                                     { x: (0*34) + 1, y: 0+1, w: 32, h: 32 },
                                     { x: (1*34) + 1, y: 0+1, w: 32, h: 32 },
                                     { x: (2*34) + 1, y: 0+1, w: 32, h: 32 },
@@ -167,7 +185,7 @@ var HEIGHT = Math.max(
                                     { x: (7*34) + 1, y: 0+1, w: 32, h: 32 }
                                   ] },
 
-      alien2: { fps: 5, frames: [
+      alien2: { fps: 5, frames: [ //pumpkin
                                     { x: (0*34) + 1, y: 64+1, w: 32, h: 32 },
                                     { x: (1*34) + 1, y: 64+1, w: 32, h: 32 },
                                     { x: (2*34) + 1, y: 64+1, w: 32, h: 32 },
@@ -178,7 +196,7 @@ var HEIGHT = Math.max(
                                     { x: (7*34) + 1, y: 64+1, w: 32, h: 32 }
                                   ] },
 
-      alien3: { fps: 5, frames: [
+      alien3: { fps: 5, frames: [ //ghost fire
                                    { x: (0*34) + 1, y: 32+1, w: 32, h: 32 },
                                    { x: (1*34) + 1, y: 32+1, w: 32, h: 32 },
                                    { x: (2*34) + 1, y: 32+1, w: 32, h: 32 },
@@ -217,10 +235,39 @@ var HEIGHT = Math.max(
       ]},
 
       rock: { fps: 10, frames: [
-        { x: (0 * 65), y: 1, w: 65, h: 32 },
-        { x: (1 * 65), y: 1, w: 65, h: 32 },
-        { x: (2 * 65), y: 1, w: 65, h: 32 },
-        { x: (3 * 65), y: 1, w: 65, h: 32 },
+              { x: (0 * 65), y: 1, w: 65, h: 32 },
+              { x: (0 * 65), y: 1, w: 65, h: 32 },
+              { x: (0 * 65), y: 1, w: 65, h: 32 },
+              { x: (0 * 65), y: 1, w: 65, h: 32 },
+              { x: (0 * 65), y: 1, w: 65, h: 32 },
+              { x: (0 * 65), y: 1, w: 65, h: 32 },
+              { x: (0 * 65), y: 1, w: 65, h: 32 },
+              { x: (0 * 65), y: 1, w: 65, h: 32 },
+              { x: (0 * 65), y: 1, w: 65, h: 32 },
+              { x: (0 * 65), y: 1, w: 65, h: 32 },
+              { x: (1 * 65), y: 1, w: 65, h: 32 },
+              { x: (1 * 65), y: 1, w: 65, h: 32 },
+              { x: (2 * 65), y: 1, w: 65, h: 32 },
+              { x: (2 * 65), y: 1, w: 65, h: 32 },
+              { x: (3 * 65), y: 1, w: 65, h: 32 },
+              { x: (3 * 65), y: 1, w: 65, h: 32 },
+              { x: (3 * 65), y: 1, w: 65, h: 32 },
+              { x: (3 * 65), y: 1, w: 65, h: 32 },
+              { x: (3 * 65), y: 1, w: 65, h: 32 },
+              { x: (2 * 65), y: 1, w: 65, h: 32 },
+              { x: (2 * 65), y: 1, w: 65, h: 32 },
+              { x: (1 * 65), y: 1, w: 65, h: 32 },
+              { x: (1 * 65), y: 1, w: 65, h: 32 },
+              { x: (0 * 65), y: 1, w: 65, h: 32 },
+              { x: (0 * 65), y: 1, w: 65, h: 32 },
+              { x: (0 * 65), y: 1, w: 65, h: 32 },
+              { x: (0 * 65), y: 1, w: 65, h: 32 },
+              { x: (0 * 65), y: 1, w: 65, h: 32 },
+              { x: (0 * 65), y: 1, w: 65, h: 32 },
+              { x: (0 * 65), y: 1, w: 65, h: 32 },
+              { x: (0 * 65), y: 1, w: 65, h: 32 },
+              { x: (0 * 65), y: 1, w: 65, h: 32 },
+              { x: (0 * 65), y: 1, w: 65, h: 32 },
       ]}
 
     }
@@ -259,27 +306,25 @@ var HEIGHT = Math.max(
 
     Game.run({
       fps:       FPS,
-      fpsmeter:  cfg.fpsmeter,
+      // fpsmeter:  cfg.fpsmeter,
       update:    engine.update.bind(engine),
       render:    engine.render.bind(engine)
     });
 
     engine.boot();
 
-          document.getElementById("delta").style.width = WIDTH;
-          document.getElementById("delta").style.height = HEIGHT;
+          document.getElementById("delta").style.width = WIDTH + "px";
+          document.getElementById("delta").style.height = HEIGHT + "px";
 
 
     document.getElementById('delta').addEventListener('click', event => {
-      if(engine.isTitle() && document.getElementById('root').style.display == 'none'){
+      if(engine.isTitle()){
         engine.start();
       }
     });
 
     document.getElementById('delta').addEventListener('mousedown', event => {
-      console.log(engine);
       if(engine.current === 'playing' || engine.current === 'preparing'){
-        console.log('1')
         player.movingUp = true;
         pressedUp = true
       }
@@ -287,8 +332,6 @@ var HEIGHT = Math.max(
 
     document.getElementById('delta').addEventListener('mouseup', event => {
       if(engine.current === 'playing' || engine.current === 'preparing'){
-
-        console.log('2')
         player.movingUp = false;
         pressedUp = false;
       }
@@ -377,6 +420,8 @@ var HEIGHT = Math.max(
         rocks.update(dt);
         effects.update(dt);
         this.detectCollisions();
+      }else if (this.isTitle()){
+          stars.update(dt);
       }
     },
 
@@ -389,6 +434,8 @@ var HEIGHT = Math.max(
         renderer.renderRocks(dt);
         renderer.renderBullets(dt);
         renderer.renderEffects(dt);
+      }else if(this.isTitle()){
+          renderer.renderStars(dt);
       }
     },
 
@@ -478,8 +525,8 @@ var HEIGHT = Math.max(
       this.h      = PLAYER.H;
       this.dx     = 0;
       this.dy     = 0;
-      this.miny   = 20;
-      this.maxy   = HEIGHT-20-PLAYER.H;
+      this.miny   = 0;
+      this.maxy   = HEIGHT-PLAYER.W+20;
       this.minx   = 20;
       this.maxx   = WIDTH/2-PLAYER.W;
       this.sprite = cfg.sprites.player;
@@ -555,7 +602,7 @@ var HEIGHT = Math.max(
       this.setLives(this.lives-1);
       this.anim.frame = 0;
       if (!this.lives){
-          updateScore(this.score);
+          updateScore(this.score, 'getScore');
           setTimeout(engine.quit.bind(engine), 4000);
       }
     }
@@ -575,7 +622,7 @@ var HEIGHT = Math.max(
       this.size   = this.player ? 50 : Game.Math.randomInt(8, 16);
       this.image  = this.player ? "energy_ball": "bullets"
       this.sprite = this.player ? cfg.sprites.bullet1 : cfg.sprites.bullet2;
-      this.speed  = this.player ? PLAYER.BULLET_SPEED : (x > player.x ? -1 : 1) * Game.Math.random(ALIEN.BULLET_SPEED.MIN, ALIEN.BULLET_SPEED.MAX);
+      this.speed  = this.player ? PLAYER.BULLET_SPEED : (x > player.x ? -1 : -1) * Game.Math.random(ALIEN.BULLET_SPEED.MIN, ALIEN.BULLET_SPEED.MAX);
       Game.animate(this);
     }
 
@@ -701,7 +748,8 @@ var HEIGHT = Math.max(
           pending: 60 + (n * wave.stagger),
           move:    0,
           frame:   0,
-          score:   100
+          score:   100,
+          escaped: false
         };
         Game.animate(alien);
         this.aliens.push(alien);
@@ -734,9 +782,9 @@ var HEIGHT = Math.max(
             alien.x = alien.x + (dt*alien.dx);
             alien.y = alien.y + (dt*alien.dy);
           }
-          if (((alien.dx < 0) && (alien.x + alien.w < 0)) ||
+          if (((alien.dx < 0) && ((alien.x + alien.w) < 0)) ||
               ((alien.dx > 0) && (alien.x > WIDTH))       ||
-              ((alien.dy < 0) && (alien.y + alien.h < 0)) ||
+              ((alien.dy < 0) && ((alien.y + alien.h) < 0)) ||
               ((alien.dy > 0) && (alien.y > HEIGHT))) {
             alien.escaped = true;
           }
@@ -762,9 +810,10 @@ var HEIGHT = Math.max(
                 }
               }
             }
-            if (!alien.cooldown) {
-              if (Game.Math.random(0, 100) > 75)
-                bullets.fire(alien, alien.x, alien.y + alien.h/2);
+            if (!alien.cooldown && !wave.defend) {
+              if (Game.Math.random(0, 100) > 75){
+                  bullets.fire(alien, alien.x, alien.y + alien.h/2);
+              }
               alien.cooldown = Game.Math.randomInt(COOLDOWN, 4*COOLDOWN);
             }
             alien.cooldown--;
@@ -901,7 +950,7 @@ var HEIGHT = Math.max(
         star.x = star.x - (star.speed * dt);
         // console.log(star.x);
 
-        if (star.x <= -WIDTH){
+        if (star.x <= -1052){
           // console.log("------------");
           this.repositionStar(star);
         }
@@ -909,7 +958,7 @@ var HEIGHT = Math.max(
     },
 
     repositionStar: function(star) {
-      star.x = WIDTH-2;
+      star.x = 1052;
       // star.y = HEIGHT;
     }
 
@@ -946,7 +995,7 @@ var HEIGHT = Math.max(
         // console.log(this);
         this.ctx.drawImage(this.images[star.image], 0, 0, 1052, 744,
                                                     star.x - (dt * star.speed), star.y,
-                                                    WIDTH, HEIGHT
+                                                    1052, HEIGHT
           );
       }
     },
@@ -954,22 +1003,25 @@ var HEIGHT = Math.max(
     renderPlayer: function(dt) {
 
       var sprite = player.sprite,
-           frame = sprite.frames[player.anim.frame];
+           frame = sprite.frames[player.anim.frame],
+          fixScale = 50;
       // console.log(player.anim.frame);
-      var playerCanvas = document.createElement("canvas");
-      playerCanvas.width = player.w;
-      playerCanvas.height = player.h;
-      var playerCtx=playerCanvas.getContext("2d");
-      playerCtx.clearRect(0,0,playerCanvas.width,playerCanvas.height);
-      playerCtx.save();
-      playerCtx.translate(playerCanvas.width/2,playerCanvas.height/2);
-      playerCtx.rotate((player.anim.frame-5)*3*Math.PI/180);
-      playerCtx.drawImage(this.images.player1,-this.images.player1.width/2,-this.images.player1.width/2);
-      playerCtx.restore();
+        if(!playerCanvas){
+            playerCanvas = document.createElement("canvas");
+            playerCtx=playerCanvas.getContext("2d");
+            playerCanvas.width = player.w << 1;
+            playerCanvas.height = player.h << 1;
+        }
+        playerCtx.save();
+        playerCtx.clearRect(0,0,playerCanvas.width,playerCanvas.height);
+        playerCtx.translate(player.w,player.h);
+        playerCtx.rotate((player.anim.frame-5)*3*Math.PI/180);
+        playerCtx.drawImage(this.images.player1,-player.w/2,-player.h/2,player.w,player.h);
+        playerCtx.restore();
 
       if (!player.dead) {
-        this.ctx.drawImage(playerCanvas, 0, 0, frame.w, frame.h,
-                                                player.x + (dt * player.dx), player.y + (dt * player.dy), player.w, player.h);
+        this.ctx.drawImage(playerCanvas, 0, 0, playerCanvas.width, playerCanvas.height,
+                                                player.x + (dt * player.dx) - player.w /2 , player.y + (dt * player.dy) - player.h /2, playerCanvas.width, playerCanvas.height);
 
         // jump effect
         // if ((player.movingUp || player.movingDown || player.movingLeft || player.movingRight) && !player.jumpCOOLDOWN) {
@@ -1193,7 +1245,7 @@ var HEIGHT = Math.max(
       Pattern.straight(null, -500,    0)
     ]),
 
-    Pattern.construct({ alien: 1, count: 10, stagger: 8, y: 'middle' }, [
+    Pattern.construct({ alien: 1, count: 10, stagger: 8, y: 'middle', defend: true }, [
       Pattern.straight(60, -500, 0),
       Pattern.rotate(-360, 500, 0, -150),
       Pattern.straight(10, -500, 0),
