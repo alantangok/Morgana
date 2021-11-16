@@ -29,6 +29,9 @@ if (cWIDTH > WIDTH){
       HITBOX   = 1,
       COOLDOWN = 15,
       jumpCOOLDOWN = 1,
+      // godCooldown = 180,
+      godCooldown = 180,
+      reviveCooldown = 60,
       pressedUp = false,
       HSPEED   = 200,
       VSPEED   = 300,
@@ -90,16 +93,16 @@ if (cWIDTH > WIDTH){
     keys: [
       { key: Game.Key.SPACE,                    mode: 'up',   state: 'title',                  action: function() { engine.start();             } },
       { key: Game.Key.ESC,                      mode: 'up',   state: 'playing',                action: function() { engine.quit();              } },
-      { key: [Game.Key.UP,    Game.Key.W],      mode: 'down', state: ['preparing', 'playing'], action: function() { player.movingUp    = pressedUp ? false : true;  pressedUp = true; } },
-      { key: [Game.Key.UP,    Game.Key.W],      mode: 'up',   state: ['preparing', 'playing'], action: function() { player.movingUp    = false; pressedUp = false;} },
+      { key: [Game.Key.SPACE],      mode: 'down', state: ['preparing', 'playing'], action: function() { player.movingUp    = pressedUp ? false : true;  pressedUp = true; } },
+      { key: [Game.Key.SPACE],      mode: 'up',   state: ['preparing', 'playing'], action: function() { player.movingUp    = false; pressedUp = false;} },
       // { key: [Game.Key.DOWN,  Game.Key.S],      mode: 'down', state: ['preparing', 'playing'], action: function() { player.movingDown  = true;  } },
       // { key: [Game.Key.DOWN,  Game.Key.S],      mode: 'up',   state: ['preparing', 'playing'], action: function() { player.movingDown  = false; } },
       // { key: [Game.Key.LEFT,  Game.Key.A],      mode: 'down', state: ['preparing', 'playing'], action: function() { player.movingLeft  = true;  } },
       // { key: [Game.Key.LEFT,  Game.Key.A],      mode: 'up',   state: ['preparing', 'playing'], action: function() { player.movingLeft  = false; } },
       // { key: [Game.Key.RIGHT, Game.Key.D],      mode: 'down', state: ['preparing', 'playing'], action: function() { player.movingRight = true;  } },
       // { key: [Game.Key.RIGHT, Game.Key.D],      mode: 'up',   state: ['preparing', 'playing'], action: function() { player.movingRight = false; } },
-      { key: [Game.Key.SPACE, Game.Key.RETURN], mode: 'down', state: ['preparing', 'playing'], action: function() { player.firing      = true;  } },
-      { key: [Game.Key.SPACE, Game.Key.RETURN], mode: 'up',   state: ['preparing', 'playing'], action: function() { player.firing      = false; } }
+      // { key: [Game.Key.SPACE, Game.Key.RETURN], mode: 'down', state: ['preparing', 'playing'], action: function() { player.firing      = true;  } },
+      // { key: [Game.Key.SPACE, Game.Key.RETURN], mode: 'up',   state: ['preparing', 'playing'], action: function() { player.firing      = false; } }
     ],
 
     stars: [
@@ -447,7 +450,7 @@ if (cWIDTH > WIDTH){
       for(a = 0, maxAliens = aliens.aliens.length ; a < maxAliens ; a++) {
         alien = aliens.aliens[a];
         if (!alien.dead) {
-          if (!player.dead && Game.Math.overlap(player.x + HITBOX, player.y + HITBOX, player.w - 2*HITBOX, player.h - 2*HITBOX,
+          if (!player.godMode && !player.dead && Game.Math.overlap(player.x + HITBOX, player.y + HITBOX, player.w - 2*HITBOX, player.h - 2*HITBOX,
                                                 alien.x  + HITBOX, alien.y  + HITBOX, alien.w  - 2*HITBOX, alien.h  - 2*HITBOX)) {
             effects.explode(10, player.x + player.w/2, player.y + player.h/2, player.dx, player.dy);
             player.die();
@@ -473,7 +476,7 @@ if (cWIDTH > WIDTH){
       // check if any alien bullets hit the player
       for(b = 0, maxBullets = bullets.pool.allocated() ; b < maxBullets ; b++) {
         bullet = bullets.pool.store[b];
-        if (!bullet.player && !player.dead && Game.Math.overlap(bullet.x, bullet.y, bullet.size, bullet.size,
+        if (!player.godMode && !bullet.player && !player.dead && Game.Math.overlap(bullet.x, bullet.y, bullet.size, bullet.size,
                                                                 player.x + HITBOX, player.y + HITBOX, player.w - 2*HITBOX, player.h - 2*HITBOX)) {
           effects.explode(10, player.x + player.w/2, player.y + player.h/2, player.dx, player.dy);
           player.die();
@@ -485,7 +488,7 @@ if (cWIDTH > WIDTH){
       // check if the player hit any rocks
       for(r = 0, maxRocks = rocks.rocks.length ; r < maxRocks ; r++) {
         rock = rocks.rocks[r];
-        if (rock.enabled && !player.dead && Game.Math.overlap(rock.x + rock.hitbox.x, rock.y + (rock.top ? 0 : rock.hitbox.y), rock.w - (2*rock.hitbox.x), rock.h - rock.hitbox.y,
+        if (!player.godMode && rock.enabled && !player.dead && Game.Math.overlap(rock.x + rock.hitbox.x, rock.y + (rock.top ? 0 : rock.hitbox.y), rock.w - (2*rock.hitbox.x), rock.h - rock.hitbox.y,
                                                               player.x + HITBOX, player.y + HITBOX, player.w - 2*HITBOX, player.h - 2*HITBOX)) {
           effects.explode(10, player.x + player.w/2, player.y + player.h/2, player.dx, player.dy);
           player.die();
@@ -531,12 +534,15 @@ if (cWIDTH > WIDTH){
       this.maxx   = WIDTH/2-PLAYER.W;
       this.sprite = cfg.sprites.player;
       this.thrust = { sprite: cfg.sprites.thrust };
+      this.godCooldown = godCooldown;
+      this.godMode = true;
       if (hard) {
         this.setScore(0);
         this.setLives(3);
       }
       Game.animate(this);
       Game.animate(this.thrust);
+
     },
 
     setLives: function(n) {
@@ -579,10 +585,12 @@ if (cWIDTH > WIDTH){
         this.x  = Game.Math.bound(this.x  + (dt * this.dx), this.minx, this.maxx);
         this.y  = Game.Math.bound(this.y  + (dt * this.dy), this.miny, this.maxy);
         if(this.y >= this.maxy){
-          this.y = this.maxy;
+          // this.y = this.maxy;
           this.die();
-          effects.explode(10, player.x + player.w/2, player.y + player.h/2, player.dx, player.dy);
+          effects.explode(5, player.x + player.w/2, player.y + player.h/2, 10, 10);
           sounds.explode();
+            this.x = player.X;
+            this.y = player.Y;
         }
 
         if (!this.cooldown) {
@@ -592,19 +600,33 @@ if (cWIDTH > WIDTH){
         }
         if (this.cooldown)
           this.cooldown--;
+        if (this.godCooldown){
+            this.godCooldown--;
+        }else{
+            this.godMode = false;
+        }
 
         // console.log(this.movingUp);
       }
+
+        if (this.dead && this.reviveCooldown > 0 && this.lives > 0){
+            this.reviveCooldown--;
+        }else if(this.dead && this.reviveCooldown >= 0 && this.lives > 0){
+            this.reset();
+        }
     },
 
     die: function() {
-      this.dead = true;
-      this.setLives(this.lives-1);
-      this.anim.frame = 0;
-      if (!this.lives){
-          updateScore(this.score, 'getScore');
-          setTimeout(engine.quit.bind(engine), 4000);
-      }
+        if(!this.godMode || this.y >= this.maxy){
+            this.dead = true;
+            this.setLives(this.lives-1);
+            this.anim.frame = 0;
+            this.reviveCooldown = reviveCooldown;
+            if (!this.lives){
+                updateScore(this.score, 'getScore');
+                setTimeout(engine.quit.bind(engine), 4000);
+            }
+        }
     }
 
   });
@@ -822,7 +844,7 @@ if (cWIDTH > WIDTH){
       }
       if (endOfWave) {
         if (player.dead && player.lives) {
-          player.reset();
+          // player.reset();
           this.startWave(this.index);
         }
         else if (!player.dead) {
@@ -1020,8 +1042,21 @@ if (cWIDTH > WIDTH){
         playerCtx.restore();
 
       if (!player.dead) {
-        this.ctx.drawImage(playerCanvas, 0, 0, playerCanvas.width, playerCanvas.height,
-                                                player.x + (dt * player.dx) - player.w /2 , player.y + (dt * player.dy) - player.h /2, playerCanvas.width, playerCanvas.height);
+          if(player.godCooldown % 10 === 1) {
+              player.godSeeThrough = !player.godSeeThrough;
+              if (player.godSeeThrough) {
+                  playerCtx.globalAlpha = 0.5;
+              } else {
+                  playerCtx.globalAlpha = 1;
+              }
+          }
+          if(!player.godMode){
+              playerCtx.globalAlpha = 1;
+          }
+
+              this.ctx.drawImage(playerCanvas, 0, 0, playerCanvas.width, playerCanvas.height,
+                  player.x + (dt * player.dx) - player.w /2 , player.y + (dt * player.dy) - player.h /2, playerCanvas.width, playerCanvas.height);
+
 
         // jump effect
         // if ((player.movingUp || player.movingDown || player.movingLeft || player.movingRight) && !player.jumpCOOLDOWN) {
@@ -1255,7 +1290,7 @@ if (cWIDTH > WIDTH){
 
     Pattern.construct({ alien: 2, y: 'top' }, [
       Pattern.straight(60, -500, 0),
-      Pattern.rotate(720, 500, 0, 200),
+      Pattern.rotate(720, 500, 0, 300),
       Pattern.straight(null, -500, 0)
     ]),
 
@@ -1272,7 +1307,7 @@ if (cWIDTH > WIDTH){
 
     Pattern.construct({ alien: 2, y: 'bottom' }, [
       Pattern.straight(60, -500, 0),
-      Pattern.rotate(-720, 500, 0, -200),
+      Pattern.rotate(-720, 500, 0, -300),
       Pattern.straight(null, -500, 0)
     ]),
 
@@ -1299,7 +1334,7 @@ if (cWIDTH > WIDTH){
     ]),
 
     Pattern.construct({ alien: 1, x: WIDTH-200, y: 'above' }, [
-      Pattern.straight(60, 0, 500),
+      Pattern.straight(120, 0, 500),
       Pattern.rotate(-360, 500, -200, 0),
       Pattern.straight(null, 0, 500)
     ]),
@@ -1320,7 +1355,7 @@ if (cWIDTH > WIDTH){
     ]),
 
     Pattern.construct({ alien: 2, y: 'top', count: 30, rocks: true }, [
-      Pattern.straight(110, -500, 0),
+      Pattern.straight(110, -100, 0),
       Pattern.rotate(180, 500, 0, 250),
       Pattern.straight(60,  500, 0),
       Pattern.rotate(180, 500, 0, -250),

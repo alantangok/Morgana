@@ -118,7 +118,15 @@
     padding-right: 0 !important;
 }
 
-.modal-open{
-    overflow: auto;
-    padding-right:0 !important;
+body,body.modal-open {
+    overflow:inherit;
+    padding-right:inherit !important;
+}
+
+#scoreLeaderboard table {
+    table-layout: fixed;
+}
+
+#scoreLeaderboard table td {
+    word-wrap: break-word;
 }

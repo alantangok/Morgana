@@ -41,7 +41,7 @@ try {
     ')->fetchColumn();
 
     // How many items to list per page
-    $limit = 1;
+    $limit = 10;
 
     // How many pages will there be
     $pages = ceil($total / $limit);
@@ -61,6 +61,13 @@ try {
     $start = $offset + 1;
     $end = min(($offset + $limit), $total);
 
+    $firstPageDisable = $page === 1 ? 'disabled' : '';
+    $lastPageDisable = $page === $pages ? 'disabled' : '';
+    $firstPage = "data-page='1'";
+    $lastPage = "data-page='$pages'";
+    $previousPage = $page - 1;
+    $nextPage = $page + 1;
+
     // The "back" link
     $prevlink = ($page > 1) ? '<a href="#" data-page="1" title="First page">&laquo;</a> <a href="#" data-page="' . ($page - 1) . '" title="Previous page">&lsaquo;</a>' : '<span class="disabled">&laquo;</span> <span class="disabled">&lsaquo;</span>';
 
@@ -73,11 +80,11 @@ try {
     // Prepare the paged query
     $stmt = $dbh->prepare('
         SELECT
-            *
+            *,
+            RANK() OVER (ORDER BY highestScore DESC) AS ranking
         FROM
             contest_leaderboard
-        ORDER BY
-            highestScore DESC
+        ORDER BY highestScore DESC
         LIMIT
             :limit
         OFFSET
@@ -95,10 +102,58 @@ try {
         $stmt->setFetchMode(PDO::FETCH_ASSOC);
         $iterator = new IteratorIterator($stmt);
 
+        echo
+'<table class="table table-hover">
+      <thead>
+        <tr class="d-flex">
+          <th class="col-2" scope="col">#</th>
+          <th class="col-7" scope="col">Wallet</th>
+          <th class="col-3" scope="col">Score</th>
+        </tr>
+      </thead>
+      <tbody>';
+
         // Display the results
         foreach ($iterator as $row) {
-            echo '<p>', $row['walletAddress'], ' - ', $row['highestScore'], '</p>';
+            echo
+            "<tr class='d-flex'>
+                <td class='col-2'>{$row['ranking']}</td>
+                <td class='col-7'>{$row['walletAddress']}</td>
+                <td class='col-3'>{$row['highestScore']}</td>
+            </tr>";
         }
+
+        echo
+        '</tbody>
+    </table>
+';
+
+        ?>
+        <nav aria-label='Page navigation example'>
+            <ul class='pagination'>
+                <li class='page-item <?php echo $firstPageDisable;?>'>
+                    <a class='page-link' href='#' aria-label='Previous' <?php echo $firstPage;?>>
+                        <span aria-hidden='true'>&laquo;</span>
+                        <span class='sr-only'>Previous</span>
+                    </a>
+                </li>
+                <?php if ($page > 1) { ?>
+                    <li class='page-item'><a class='page-link' href='#' data-page='<?php echo $previousPage;?>'><?php echo $previousPage;?></a></li>
+                <?php } ?>
+                <li class='page-item'><a class='page-link' href='#' data-page='<?php echo $page;?>'><?php echo $page;?></a></li>
+                <?php if ($page < $pages) { ?>
+                    <li class='page-item'><a class='page-link' href='#' data-page='<?php echo $nextPage;?>'><?php echo $nextPage;?></a></li>
+                <?php } ?>
+                <li class='page-item <?php echo $lastPageDisable;?>'>
+                    <a class='page-link' href='#' aria-label='Next' <?php echo $lastPage;?>>
+                        <span aria-hidden='true'>&raquo;</span>
+                        <span class='sr-only'>Next</span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+
+        <?php
 
     } else {
         echo '<p>No results could be displayed.</p>';
