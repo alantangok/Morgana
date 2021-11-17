@@ -9,12 +9,12 @@
     <link rel="manifest" href="/manifest.json"/>
     <title>Morgana Shoot em' up</title>
 
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.1/dist/css/bootstrap.min.css" integrity="sha384-zCbKRCUGaJDkqS1kPbPd7TveP5iyJE0EjAuZQTgFLD2ylzuqKfdKlfG/eSrtxUkn" crossorigin="anonymous">
-    <link href="css/normalize.css" media="screen, print" rel="stylesheet" type="text/css"/>
-    <link href="css/delta.css" media="screen, print" rel="stylesheet" type="text/css"/>
+    <link rel="stylesheet" href="css/bootstrap.min.css?v=0.5">
+    <link href="css/normalize.css?v=0.5" media="screen, print" rel="stylesheet" type="text/css"/>
+    <link href="css/delta.css?v=0.5" media="screen, print" rel="stylesheet" type="text/css"/>
 
-    <link href="static/css/main.01e9d104.chunk.css" rel="stylesheet">
-    <link href="css/morgana-game.css" rel="stylesheet">
+    <link href="static/css/main.01e9d104.chunk.css?v=0.5" rel="stylesheet">
+    <link href="css/morgana-game.css?v=0.5" rel="stylesheet">
 </head>
 <body>
 <noscript>You need to enable JavaScript to run this app.</noscript>
@@ -93,6 +93,16 @@
 
 <div id="delta">
 
+    <button class="cn-button" id="cn-button">+</button>
+    <div class="cn-wrapper" id="cn-wrapper">
+        <ul>
+            <li><a href="#" data-attack="fire"><img src="images/ui/attackButton/pumpkin.png"></a></li>
+            <li><a href="#" data-attack="ice"><img src="images/ui/attackButton/ghost-fire.png"></a></li>
+            <li><a href="#" data-attack="energy_ball"><img src="images/ui/attackButton/phantom.png"></a></li>
+        </ul>
+    </div>
+    <div id="cn-overlay" class="cn-overlay"></div>
+
     <div id="scoreboard">
         <span class="lives"><span class="label">LIVES:</span><img class="one" src="images/life.png"><img class="two"
                                                                                                          src="images/life.png"><img
@@ -116,19 +126,73 @@
 
 </div>
 
-<script src="js/react.js"></script>
-<script src="static/js/2.316cc20d.chunk.js"></script>
-<script src="static/js/main.e06d2db9.chunk.js"></script>
+<script src="js/react.js?v=0.5"></script>
+<script src="static/js/2.316cc20d.chunk.js?v=0.5"></script>
+<script src="static/js/main.e06d2db9.chunk.js?v=0.5"></script>
 
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.1/dist/js/bootstrap.bundle.min.js" integrity="sha384-fQybjgWLrvvRgtW6bFlB7jaZrFsaBXjsOMm/tB9LTS58ONXgqbR9W8oWht/amnpF" crossorigin="anonymous"></script>
+<script src="js/jquery-3.6.0.min.js?v=0.5"></script>
+<script src="js/bootstrap.bundle.min.js?v=0.5"></script>
 <script>var jq = $.noConflict();</script>
 
-<script src="js/vendor.js"></script>
-<script src="js/game.js"></script>
-<script src="js/delta.js"></script>
+<script src="js/vendor.js?v=0.5"></script>
+<script src="js/game.js?v=0.5"></script>
+<script src="js/delta.js?v=0.5"></script>
 
 <script>
+    (function(){
+
+        var button = document.getElementById('cn-button'),
+            wrapper = document.getElementById('cn-wrapper'),
+            overlay = document.getElementById('cn-overlay');
+
+        //open and close menu when the button is clicked
+        var open = false;
+        // button.addEventListener('click', handler, false);
+        // wrapper.addEventListener('click', cnhandle, false);
+
+        function cnhandle(e){
+            e.stopPropagation();
+        }
+
+        function handler(e){
+            if (!e) var e = window.event;
+            e.stopPropagation();//so that it doesn't trigger click event on document
+
+            if(!open){
+                openNav();
+            }
+            else{
+                closeNav();
+            }
+        }
+        function openNav(){
+            open = true;
+            button.innerHTML = "-";
+            jq(wrapper).addClass('opened-nav');
+        }
+        function closeNav(){
+            open = false;
+            button.innerHTML = "+";
+            jq(wrapper).removeClass('opened-nav');
+        }
+        // jq('#canvas').on('click', function (event) {closeNav();});
+        window.openNav = function(){openNav();}
+        window.closeNav = function(){closeNav();}
+
+    })();
+
+    jq('#cn-wrapper a').on('click', function (event) {
+        attack = jq(event.target).data("attack");
+        if (['fire', 'ice', 'energy_ball'].indexOf(attack) !== -1){
+            Delta2.player.attack = attack;
+        }
+    });
+
+    jq('#cn-wrapper a img').on('click', function (event) {
+        jq(event.target).parent('a').click();
+    });
+
+    var Delta2;
     var walletAddress = "";
     var appendedList = [];
     var runnging = false;
@@ -177,7 +241,7 @@
                 });
             });
 
-        jq('.score span').on('click', function (event) {
+        jq('.score').on('click', function (event) {
             getScore();
             return false;
         });
@@ -187,7 +251,7 @@
     function enterGame(morganaId) {
         document.getElementById('delta').style.display = 'contents';
         if (!runnging) {
-            Delta(morganaId);
+            Delta2 = Delta(morganaId);
             runnging = true;
         }
     }

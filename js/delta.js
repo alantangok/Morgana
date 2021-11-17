@@ -28,6 +28,7 @@ if (cWIDTH > WIDTH){
       RATIO    = WIDTH/HEIGHT,
       HITBOX   = 1,
       COOLDOWN = 15,
+      alienCOOLDOWN = 60,
       jumpCOOLDOWN = 1,
       // godCooldown = 180,
       godCooldown = 180,
@@ -70,7 +71,9 @@ if (cWIDTH > WIDTH){
       { id: "bg_Mo_fair", url: "images/bg_Mo_fair.png" },
       { id: "bg_Mo_middle", url: "images/bg_Mo_middle.png" },
       { id: "bg_Mo_close", url: "images/bg_Mo_close.png" },
-      { id: "energy_ball", url: "images/energy_ball.png" }
+      { id: "energy_ball", url: "images/attack/energy_ball.png" },
+      { id: "fire", url: "images/attack/fireball1.png" },
+      { id: "ice", url: "images/attack/icespike1.png" }
     ],
 
     sounds: [
@@ -395,9 +398,9 @@ if (cWIDTH > WIDTH){
 
     onenterbooting:   function() { $('booting').show();                                              },
     onleavebooting:   function() { $('booting').hide();                                              },
-    onentertitle:     function() { $('title').fadein();  $('start').show(); sounds.playTitleMusic(); },
+    onentertitle:     function() { $('title').fadein();  $('start').show(); sounds.playTitleMusic(); window.closeNav(); $('cn-wrapper').fadeout(); $('cn-button').fadeout();  },
     onleavetitle:     function() { $('title').fadeout(); $('start').hide();                          },
-    onenterpreparing: function() { $('prepare').fadein(); sounds.playGameMusic();                    },
+    onenterpreparing: function() { $('prepare').fadein(); sounds.playGameMusic();$('cn-wrapper').fadein();$('cn-button').fadein();window.openNav();                  },
     onleavepreparing: function() { $('prepare').fadeout(); },
 
     onenterstate: function(event, from, to) {
@@ -459,7 +462,7 @@ if (cWIDTH > WIDTH){
           }
           for(b = 0, maxBullets = bullets.pool.allocated() ; b < maxBullets ; b++) {
             bullet = bullets.pool.store[b];
-            if (bullet.player && Game.Math.overlap(bullet.x, bullet.y, bullet.size, bullet.size,
+            if ( alien.acceptAttack.indexOf(bullet.attack) !== -1 && bullet.player && Game.Math.overlap(bullet.x, bullet.y, bullet.size, bullet.size,
                                                    alien.x,  alien.y,  alien.w,  alien.h)) {
               effects.explode(1, alien.x + alien.w/2, alien.y + alien.h/2, alien.dx, alien.dy);
               aliens.die(alien);
@@ -536,6 +539,7 @@ if (cWIDTH > WIDTH){
       this.thrust = { sprite: cfg.sprites.thrust };
       this.godCooldown = godCooldown;
       this.godMode = true;
+      this.attack = this.attack ? this.attack : 'ice';
       if (hard) {
         this.setScore(0);
         this.setLives(3);
@@ -565,7 +569,6 @@ if (cWIDTH > WIDTH){
     },
 
     update: function(dt) {
-      // console.log(this.movingUp);
       if (!this.dead) {
         Game.animate(this);
         Game.animate(this.thrust);
@@ -642,7 +645,8 @@ if (cWIDTH > WIDTH){
       this.x      = x;
       this.y      = y;
       this.size   = this.player ? 50 : Game.Math.randomInt(8, 16);
-      this.image  = this.player ? "energy_ball": "bullets"
+      this.image  = this.player ? player.attack: "bullets";
+      this.attack  = this.player ? player.attack: false;
       this.sprite = this.player ? cfg.sprites.bullet1 : cfg.sprites.bullet2;
       this.speed  = this.player ? PLAYER.BULLET_SPEED : (x > player.x ? -1 : -1) * Game.Math.random(ALIEN.BULLET_SPEED.MIN, ALIEN.BULLET_SPEED.MAX);
       Game.animate(this);
@@ -669,6 +673,8 @@ if (cWIDTH > WIDTH){
     },
 
     update: function(dt) {
+
+        console.log(this.image);
       var n, max, bullet;
       for(n = 0, max = this.pool.allocated() ; n < max ; n++) {
         bullet = this.pool.store[n];
@@ -771,7 +777,8 @@ if (cWIDTH > WIDTH){
           move:    0,
           frame:   0,
           score:   100,
-          escaped: false
+          escaped: false,
+          acceptAttack: wave.acceptAttack,
         };
         Game.animate(alien);
         this.aliens.push(alien);
@@ -836,7 +843,7 @@ if (cWIDTH > WIDTH){
               if (Game.Math.random(0, 100) > 75){
                   bullets.fire(alien, alien.x, alien.y + alien.h/2);
               }
-              alien.cooldown = Game.Math.randomInt(COOLDOWN, 4*COOLDOWN);
+              alien.cooldown = Game.Math.randomInt(alienCOOLDOWN, 4*alienCOOLDOWN);
             }
             alien.cooldown--;
           }
@@ -845,7 +852,7 @@ if (cWIDTH > WIDTH){
       if (endOfWave) {
         if (player.dead && player.lives) {
           // player.reset();
-          this.startWave(this.index);
+          this.startWave(this.index < this.waves.length-1 ? this.index + 1 : 0);
         }
         else if (!player.dead) {
           this.startWave(this.index < this.waves.length-1 ? this.index + 1 : 0);
@@ -1102,6 +1109,8 @@ if (cWIDTH > WIDTH){
         bullet = bullets.pool.store[n];
         sprite = bullet.sprite;
         frame  = sprite.frames[bullet.anim.frame];
+        console.log(this.images[bullet.image])
+        console.log(bullet.image)
         this.ctx.drawImage(this.images[bullet.image], frame.x,  frame.y,  frame.w,     frame.h,
                                                 bullet.x + (dt * bullet.speed), bullet.y, bullet.size, bullet.size);
       }
@@ -1259,28 +1268,31 @@ if (cWIDTH > WIDTH){
 
   cfg.aliens = [
 
-    Pattern.construct({ alien: 3, y: 'middle' }, [
+      //
+    Pattern.construct({ alien: 3, y: 'middle', acceptAttack: ['ice'] }, [
       Pattern.straight(20,   -500,    0),
       Pattern.straight(30,   -500, -300),
       Pattern.straight(30,      0,  300),
       Pattern.straight(null, -500,    0)
     ]),
 
-    Pattern.construct({ alien: 3, y: 'bottom', rocks: true }, [
+    Pattern.construct({ alien: 3, y: 'bottom', rocks: true, acceptAttack: ['ice'] }, [
       Pattern.straight(20,   -500,    0),
       Pattern.straight(30,   -500, -300),
       Pattern.straight(30,      0,  300),
       Pattern.straight(null, -500,    0)
     ]),
 
-    Pattern.construct({ alien: 3, y: 'top', rocks: true }, [
+      //ghost fire
+    Pattern.construct({ alien: 3, y: 'top', rocks: true, acceptAttack: ['ice'] }, [
       Pattern.straight(20,   -500,    0),
       Pattern.straight(30,   -500,  300),
       Pattern.straight(30,      0, -300),
       Pattern.straight(null, -500,    0)
     ]),
 
-    Pattern.construct({ alien: 1, count: 10, stagger: 8, y: 'middle', defend: true }, [
+      //phantom
+    Pattern.construct({ alien: 1, count: 10, stagger: 8, y: 'middle', defend: true, acceptAttack: ['energy_ball'] }, [
       Pattern.straight(60, -500, 0),
       Pattern.rotate(-360, 500, 0, -150),
       Pattern.straight(10, -500, 0),
@@ -1288,13 +1300,14 @@ if (cWIDTH > WIDTH){
       Pattern.straight(null, -500, 0)
     ]),
 
-    Pattern.construct({ alien: 2, y: 'top' }, [
+      //pumpkin
+    Pattern.construct({ alien: 2, y: 'top', acceptAttack: ['fire'] }, [
       Pattern.straight(60, -500, 0),
       Pattern.rotate(720, 500, 0, 300),
       Pattern.straight(null, -500, 0)
     ]),
 
-    Pattern.construct({ alien: 1, y: 'middle' }, [
+    Pattern.construct({ alien: 1, y: 'middle', acceptAttack: ['energy_ball'] }, [
       Pattern.straight(10, -400, 0),
       Pattern.rotate( 180, 400, -120, 0),
       Pattern.rotate(-180, 400, -120, 0),
@@ -1305,13 +1318,13 @@ if (cWIDTH > WIDTH){
       Pattern.straight(null, -400, 0)
     ]),
 
-    Pattern.construct({ alien: 2, y: 'bottom' }, [
+    Pattern.construct({ alien: 2, y: 'bottom', acceptAttack: ['fire'] }, [
       Pattern.straight(60, -500, 0),
       Pattern.rotate(-720, 500, 0, -300),
       Pattern.straight(null, -500, 0)
     ]),
 
-    Pattern.construct({ alien: 3, y: 'bottom', count: 10, stagger: 9, rocks: true }, [
+    Pattern.construct({ alien: 3, y: 'bottom', count: 10, stagger: 9, rocks: true, acceptAttack: ['ice'] }, [
       Pattern.straight(60,   -300,    0),
       Pattern.straight(60,      0, -450),
       Pattern.straight(20,   -300,    0),
@@ -1327,34 +1340,34 @@ if (cWIDTH > WIDTH){
       Pattern.straight(null, -300,    0)
     ]),
 
-    Pattern.construct({ alien: 1, x: WIDTH-200, y: 'below' }, [
+    Pattern.construct({ alien: 1, x: WIDTH-200, y: 'below', defend: true, acceptAttack: ['energy_ball'] }, [
       Pattern.straight(60, 0, -500),
       Pattern.rotate(360, 500, -200, 0),
       Pattern.straight(null, 0, -500)
     ]),
 
-    Pattern.construct({ alien: 1, x: WIDTH-200, y: 'above' }, [
+    Pattern.construct({ alien: 1, x: WIDTH-200, y: 'above', defend: true, acceptAttack: ['energy_ball'] }, [
       Pattern.straight(120, 0, 500),
       Pattern.rotate(-360, 500, -200, 0),
       Pattern.straight(null, 0, 500)
     ]),
 
-    Pattern.construct({ alien: 2, x: 'after', y: 'top', count: 12, rocks: true }, [
+    Pattern.construct({ alien: 2, x: 'after', y: 'top', count: 12, rocks: true, acceptAttack: ['fire'] }, [
       Pattern.straight(5, -800, 0),
       Pattern.rotate(360, 600, 0, 220, { dx: -80, dy: 0 })
     ]),
 
-    Pattern.construct({ alien: 2, x: WIDTH-200, y: 'below' }, [
+    Pattern.construct({ alien: 2, x: WIDTH-200, y: 'below', acceptAttack: ['fire'] }, [
       Pattern.straight(60, 0, -500),
       Pattern.straight(null, -800, -200)
     ]),
 
-    Pattern.construct({ alien: 2, x: WIDTH-200, y: 'above' }, [
+    Pattern.construct({ alien: 2, x: WIDTH-200, y: 'above', acceptAttack: ['fire'] }, [
       Pattern.straight(60, 0, 500),
       Pattern.straight(null, -800, 200)
     ]),
 
-    Pattern.construct({ alien: 2, y: 'top', count: 30, rocks: true }, [
+    Pattern.construct({ alien: 2, y: 'top', count: 30, rocks: true, acceptAttack: ['fire'] }, [
       Pattern.straight(110, -100, 0),
       Pattern.rotate(180, 500, 0, 250),
       Pattern.straight(60,  500, 0),
