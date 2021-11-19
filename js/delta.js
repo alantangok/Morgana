@@ -98,22 +98,14 @@ if (cWIDTH > WIDTH){
       { key: Game.Key.ESC,                      mode: 'up',   state: 'playing',                action: function() { engine.quit();              } },
       { key: [Game.Key.SPACE],      mode: 'down', state: ['preparing', 'playing'], action: function() { player.movingUp    = pressedUp ? false : true;  pressedUp = true; } },
       { key: [Game.Key.SPACE],      mode: 'up',   state: ['preparing', 'playing'], action: function() { player.movingUp    = false; pressedUp = false;} },
-      // { key: [Game.Key.DOWN,  Game.Key.S],      mode: 'down', state: ['preparing', 'playing'], action: function() { player.movingDown  = true;  } },
-      // { key: [Game.Key.DOWN,  Game.Key.S],      mode: 'up',   state: ['preparing', 'playing'], action: function() { player.movingDown  = false; } },
-      // { key: [Game.Key.LEFT,  Game.Key.A],      mode: 'down', state: ['preparing', 'playing'], action: function() { player.movingLeft  = true;  } },
-      // { key: [Game.Key.LEFT,  Game.Key.A],      mode: 'up',   state: ['preparing', 'playing'], action: function() { player.movingLeft  = false; } },
-      // { key: [Game.Key.RIGHT, Game.Key.D],      mode: 'down', state: ['preparing', 'playing'], action: function() { player.movingRight = true;  } },
-      // { key: [Game.Key.RIGHT, Game.Key.D],      mode: 'up',   state: ['preparing', 'playing'], action: function() { player.movingRight = false; } },
-      // { key: [Game.Key.SPACE, Game.Key.RETURN], mode: 'down', state: ['preparing', 'playing'], action: function() { player.firing      = true;  } },
-      // { key: [Game.Key.SPACE, Game.Key.RETURN], mode: 'up',   state: ['preparing', 'playing'], action: function() { player.firing      = false; } }
     ],
 
     stars: [
       { x: -(1052/2-WIDTH/2), y: 0, speed: { min:   0, max:   0 }, image: "bg_Mo_fair" }, // 1 in 3 get a tint of red
       {  x: 0, y: 0, speed: { min:   16, max:  16 }, image: "bg_Mo_middle" },
       {  x: 1052, y: 0, speed: { min:   16, max:  16 }, image: "bg_Mo_middle" },
-      {  x: 0, y: 0, speed: { min: 64, max: 64 }, image: "bg_Mo_close" },
-      {  x: 1052, y: 0, speed: { min: 64, max: 64 }, image: "bg_Mo_close" },
+      {  x: 0, y: 0, speed: { min: 32, max: 32 }, image: "bg_Mo_close" },
+      {  x: 1052, y: 0, speed: { min: 32, max: 32 }, image: "bg_Mo_close" },
     ],
 
     sprites: {
@@ -400,7 +392,7 @@ if (cWIDTH > WIDTH){
     onleavebooting:   function() { $('booting').hide();                                              },
     onentertitle:     function() { $('title').fadein();  $('start').show(); sounds.playTitleMusic(); window.closeNav(); $('cn-wrapper').fadeout(); $('cn-button').fadeout();  },
     onleavetitle:     function() { $('title').fadeout(); $('start').hide();                          },
-    onenterpreparing: function() { $('prepare').fadein(); sounds.playGameMusic();$('cn-wrapper').fadein();$('cn-button').fadein();window.openNav();                  },
+    onenterpreparing: function() { $('prepare').fadein(); sounds.playGameMusic();$('cn-wrapper').show();$('cn-button').fadein();window.openNav();                  },
     onleavepreparing: function() { $('prepare').fadeout(); },
 
     onenterstate: function(event, from, to) {
@@ -674,7 +666,7 @@ if (cWIDTH > WIDTH){
 
     update: function(dt) {
 
-        console.log(this.image);
+        // console.log(this.image);
       var n, max, bullet;
       for(n = 0, max = this.pool.allocated() ; n < max ; n++) {
         bullet = this.pool.store[n];
@@ -753,7 +745,7 @@ if (cWIDTH > WIDTH){
   var Aliens = Class.create({
 
     reset: function() {
-      this.waves = cfg.aliens;
+      this.waves = this.shuffleArray(cfg.aliens);
       this.startWave(0);
     },
 
@@ -784,6 +776,29 @@ if (cWIDTH > WIDTH){
         this.aliens.push(alien);
       }
       rocks.enable(wave.rocks);
+
+        var attacks = [
+            {
+                attack: 'fire',
+                deg: '0'
+            },
+            {
+                attack: 'ice',
+                deg: '60'
+            },
+            {
+                attack: 'energy_ball',
+                deg: '120'
+            }
+        ];
+
+        for(var ak = 0 ; ak < attacks.length ; ak++){
+            var rotatoDeg = 180 / attacks.length * ak;
+            jq("#cn-wrapper .waveProgress." + attacks[ak].attack).css('transform','rotate('+attacks[ak].deg+'deg) skew(30deg) scale(0)');
+        }
+
+        jq("#cn-wrapper .attackBtn img").css('opacity',0.25);
+        jq("#cn-wrapper .attackBtn." + wave.acceptAttack + ' img').css('opacity',1);
     },
 
     die: function(alien) {
@@ -791,7 +806,9 @@ if (cWIDTH > WIDTH){
     },
 
     update: function(dt) {
-      var n, alien, move, endOfWave = true, wave = this.waves[this.index], lastMove = wave.moves.length-1;
+      var n, alien, move, endOfWave = true, wave = this.waves[this.index], lastMove = wave.moves.length-1,
+          finished, finishedParcentage, frame, recentMove, recentAlienMove;
+
       for(n = 0 ; n < this.aliens.length ; n++) {
         alien = this.aliens[n];
         if (alien.pending) {
@@ -821,6 +838,9 @@ if (cWIDTH > WIDTH){
             endOfWave = false;
             if (alien.move < lastMove) {
               alien.frame = alien.frame + 1;
+              if(n===(0)){
+                  this.firstAlienMove = true;
+              }
               if (alien.frame == move.f) {
                 move = wave.moves[++alien.move];
                 alien.frame = 0;
@@ -848,8 +868,97 @@ if (cWIDTH > WIDTH){
             alien.cooldown--;
           }
         }
+
       }
-      if (endOfWave) {
+        this.moveframe = this.moveframe ? this.moveframe : 0;
+
+        if(this.moveframe > wave.totalMove / 4){
+            if(this.moveframe % 10 === 1 && this.moveframe !== wave.totalMove) {
+                this.nextWaveAttackSeeThrough = !this.nextWaveAttackSeeThrough;
+                if (this.nextWaveAttackSeeThrough) {
+                    var alpha = 0.25;
+                } else {
+                    var alpha = 1;
+                }
+                var nextIndex = this.index < this.waves.length-1 ? this.index + 1 : 0;
+                var nextAcceptAttack = this.waves[nextIndex].acceptAttack[0];
+                jq("#cn-wrapper .attackBtn." + nextAcceptAttack + ' img').css('opacity',alpha);
+            }else if(this.moveframe === wave.totalMove){
+                var alpha = 1;
+                var nextIndex = this.index < this.waves.length-1 ? this.index + 1 : 0;
+                var nextAcceptAttack = this.waves[nextIndex].acceptAttack[0];
+                jq("#cn-wrapper .attackBtn." + nextAcceptAttack + ' img').css('opacity',alpha);
+            }
+        }
+
+
+        if(this.moveframe < wave.totalMove && this.firstAlienMove){
+            finishedParcentage = this.moveframe / wave.totalMove;
+            this.moveframe++;
+
+            var rotatoDeg, acceptAttack, attackClass, scale;
+            acceptAttack = this.waves[this.index].acceptAttack[0];
+            // console.log(acceptAttack);
+            var attacks = [
+                {
+                    attack: 'fire',
+                    deg: '0'
+                },
+                {
+                    attack: 'ice',
+                    deg: '60'
+                },
+                {
+                    attack: 'energy_ball',
+                    deg: '120'
+                }
+            ];
+            var attack = attacks.filter(function (a) { return a.attack == acceptAttack });
+            jq("#cn-wrapper .waveProgress." + attack[0].attack).css('transform','rotate('+attack[0].deg+'deg) skew(30deg) scale('+finishedParcentage+')');
+
+
+            // if(acceptAttack !== 'fire'){
+            //     rotatoDeg = 0;
+            //     jq("#cn-wrapper .waveProgress.fire").css('transform','rotate('+rotatoDeg+'deg) skew(30deg) scale(0)');
+            // }
+            // if(acceptAttack !== 'ice'){
+            //     rotatoDeg = 60;
+            //     jq("#cn-wrapper .waveProgress.ice").css('transform','rotate('+rotatoDeg+'deg) skew(30deg) scale(0)');
+            // }
+            // if(acceptAttack !== 'energy_ball'){
+            //     rotatoDeg = 120;
+            //     jq("#cn-wrapper .waveProgress.energy_ball").css('transform','rotate('+rotatoDeg+'deg) skew(30deg) scale(0)');
+            // }
+            // if(acceptAttack === 'fire'){
+            //     rotatoDeg = 0;
+            // }else if(acceptAttack === 'ice'){
+            //     rotatoDeg = 60;
+            // }else if(acceptAttack === 'energy_ball'){
+            //     rotatoDeg = 120;
+            // }
+            // jq("#cn-wrapper .waveProgress." + acceptAttack).css('transform','rotate('+rotatoDeg+'deg) skew(30deg) scale('+finishedParcentage+')');
+        }
+
+        if (endOfWave) {
+
+            var alpha = 1;
+            var nextIndex = this.index < this.waves.length-1 ? this.index + 1 : 0;
+            var nextAcceptAttack = this.waves[nextIndex].acceptAttack[0];
+            jq("#cn-wrapper .attackBtn img").css('opacity',0.25);
+            jq("#cn-wrapper .attackBtn." + nextAcceptAttack + ' img').css('opacity',alpha);
+
+            aliens.firstAlienMove = false;
+            aliens.moveframe = 0;
+            // if(acceptAttack === 'fire'){
+            //     rotatoDeg = 0;
+            // }else if(acceptAttack === 'ice'){
+            //     rotatoDeg = 60;
+            // }else if(acceptAttack === 'energy_ball'){
+            //     rotatoDeg = 120;
+            // }
+            // jq("#cn-wrapper .waveProgress." + acceptAttack).css('transform','rotate('+rotatoDeg+'deg) skew(30deg) scale(0)');
+
+
         if (player.dead && player.lives) {
           // player.reset();
           this.startWave(this.index < this.waves.length-1 ? this.index + 1 : 0);
@@ -858,6 +967,13 @@ if (cWIDTH > WIDTH){
           this.startWave(this.index < this.waves.length-1 ? this.index + 1 : 0);
         }
       }
+    },
+      shuffleArray: function (array) {
+        for (let i = array.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [array[i], array[j]] = [array[j], array[i]];
+        }
+        return array;
     }
 
   });
@@ -1109,8 +1225,8 @@ if (cWIDTH > WIDTH){
         bullet = bullets.pool.store[n];
         sprite = bullet.sprite;
         frame  = sprite.frames[bullet.anim.frame];
-        console.log(this.images[bullet.image])
-        console.log(bullet.image)
+        // console.log(this.images[bullet.image])
+        // console.log(bullet.image)
         this.ctx.drawImage(this.images[bullet.image], frame.x,  frame.y,  frame.w,     frame.h,
                                                 bullet.x + (dt * bullet.speed), bullet.y, bullet.size, bullet.size);
       }
@@ -1207,6 +1323,7 @@ if (cWIDTH > WIDTH){
       options.y       = this.y(options);
       options.sprite  = this.sprite(options);
       options.moves   = moves;
+      options.totalMove = this.totalMove(moves);
       return options;
     },
 
@@ -1260,6 +1377,14 @@ if (cWIDTH > WIDTH){
         return HEIGHT/2 - options.h/2;
       else
         return y - options.h/2;
+    },
+
+    totalMove: function (moves) {
+        var totalMove = 0;
+        for(var n = 0 ; n < moves.length ; n++) {
+            totalMove = totalMove + moves[n].f;
+        }
+        return totalMove;
     }
 
   };

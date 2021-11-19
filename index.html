@@ -3,18 +3,18 @@
 <head>
     <meta charset="utf-8"/>
     <link rel="icon" href="images/favicon.png"/>
-    <meta name="viewport" content="width=device-width,initial-scale=0.75, maximum-scale=0.75, user-scalable=no"/>
+    <meta name="viewport" content="width=device-width,initial-scale=0.7, maximum-scale=0.7, user-scalable=no"/>
     <meta name="theme-color" content="#000000"/>
     <meta name="description" content="Shoot em' up"/>
     <link rel="manifest" href="/manifest.json"/>
     <title>Morgana Shoot em' up</title>
 
-    <link rel="stylesheet" href="css/bootstrap.min.css?v=0.5">
-    <link href="css/normalize.css?v=0.5" media="screen, print" rel="stylesheet" type="text/css"/>
-    <link href="css/delta.css?v=0.5" media="screen, print" rel="stylesheet" type="text/css"/>
+    <link rel="stylesheet" href="css/bootstrap.min.css?v=0.6">
+    <link href="css/normalize.css?v=0.6" media="screen, print" rel="stylesheet" type="text/css"/>
+    <link href="css/delta.css?v=0.6" media="screen, print" rel="stylesheet" type="text/css"/>
 
-    <link href="static/css/main.01e9d104.chunk.css?v=0.5" rel="stylesheet">
-    <link href="css/morgana-game.css?v=0.5" rel="stylesheet">
+    <link href="static/css/main.01e9d104.chunk.css?v=0.6" rel="stylesheet">
+    <link href="css/morgana-game.css?v=0.6" rel="stylesheet">
 </head>
 <body>
 <noscript>You need to enable JavaScript to run this app.</noscript>
@@ -96,9 +96,12 @@
     <button class="cn-button" id="cn-button">+</button>
     <div class="cn-wrapper" id="cn-wrapper">
         <ul>
-            <li><a href="#" data-attack="fire"><img src="images/ui/attackButton/pumpkin.png"></a></li>
-            <li><a href="#" data-attack="ice"><img src="images/ui/attackButton/ghost-fire.png"></a></li>
-            <li><a href="#" data-attack="energy_ball"><img src="images/ui/attackButton/phantom.png"></a></li>
+            <li class="waveProgress fire"><a href="#" data-attack="fire"></a></li>
+            <li class="waveProgress ice"><a href="#" data-attack="ice"></a></li>
+            <li class="waveProgress energy_ball"><a href="#" data-attack="energy_ball"></a></li>
+            <li class="attackBtn fire"><a href="#" data-attack="fire"><img src="images/ui/attackButton/pumpkin.png"></a></li>
+            <li class="attackBtn ice"><a href="#" data-attack="ice"><img src="images/ui/attackButton/ghost-fire.png"></a></li>
+            <li class="attackBtn energy_ball"><a href="#" data-attack="energy_ball"><img src="images/ui/attackButton/phantom.png"></a></li>
         </ul>
     </div>
     <div id="cn-overlay" class="cn-overlay"></div>
@@ -126,17 +129,17 @@
 
 </div>
 
-<script src="js/react.js?v=0.5"></script>
-<script src="static/js/2.316cc20d.chunk.js?v=0.5"></script>
-<script src="static/js/main.e06d2db9.chunk.js?v=0.5"></script>
+<script src="js/react.js?v=0.6"></script>
+<script src="static/js/2.316cc20d.chunk.js?v=0.6"></script>
+<script src="static/js/main.e06d2db9.chunk.js?v=0.6"></script>
 
-<script src="js/jquery-3.6.0.min.js?v=0.5"></script>
-<script src="js/bootstrap.bundle.min.js?v=0.5"></script>
+<script src="js/jquery-3.6.0.min.js?v=0.6"></script>
+<script src="js/bootstrap.bundle.min.js?v=0.6"></script>
 <script>var jq = $.noConflict();</script>
 
-<script src="js/vendor.js?v=0.5"></script>
-<script src="js/game.js?v=0.5"></script>
-<script src="js/delta.js?v=0.5"></script>
+<script src="js/vendor.js?v=0.6"></script>
+<script src="js/game.js?v=0.6"></script>
+<script src="js/delta.js?v=0.6"></script>
 
 <script>
     (function(){
@@ -182,11 +185,22 @@
     })();
 
     jq('#cn-wrapper a').on('click', function (event) {
+        // console.log(event.target);
+        jq('#cn-wrapper a').removeClass("active");
+        jq(event.target).addClass("active");
+        jq(event.target).parent('a').addClass("active");
+        // setTimeout(clickPop, 100, event.target);
         attack = jq(event.target).data("attack");
         if (['fire', 'ice', 'energy_ball'].indexOf(attack) !== -1){
             Delta2.player.attack = attack;
         }
     });
+
+    // function clickPop(identifier){
+    //     console.log('clickPop');
+    //     console.log(identifier);
+    //     jq(identifier).find('img').removeClass("cnClick");
+    // }
 
     jq('#cn-wrapper a img').on('click', function (event) {
         jq(event.target).parent('a').click();
