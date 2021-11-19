@@ -40,8 +40,8 @@ if (cWIDTH > WIDTH){
       thrust   = 300,
       GRAVITY  = 10,
       PLAYER   = { X: 50, Y: 150, W: 128,  H: 128, BULLET_SPEED: 1000 },
-      ALIEN    = {                W: 32,  H: 32, BULLET_SPEED: { MIN: 400, MAX: 800 } },
-      ROCK     = {                W: 256, H: 128, DX: -500 },
+      ALIEN    = {                W: 32,  H: 32, BULLET_SPEED: { MIN: 400, MAX: 600 } },
+      ROCK     = {                W: 256, H: 128, DX: -375 },
       playerCanvas, playerCtx
 
 
@@ -745,8 +745,9 @@ if (cWIDTH > WIDTH){
   var Aliens = Class.create({
 
     reset: function() {
-      this.waves = this.shuffleArray(cfg.aliens);
+      this.waves = cfg.aliens;
       this.startWave(0);
+      jq("#cn-wrapper .attackBtn." + this.waves[0].acceptAttack + ' a').click();
     },
 
     startWave: function(index) {
@@ -754,6 +755,20 @@ if (cWIDTH > WIDTH){
       this.index  = index;
       this.frame  = 0;
       this.aliens = [];
+      this.attacks = [
+        {
+          attack: 'fire',
+          deg: '0'
+        },
+        {
+          attack: 'ice',
+          deg: '60'
+        },
+        {
+          attack: 'energy_ball',
+          deg: '120'
+        }
+      ];
 
       var n, alien, wave = this.waves[index];
       for(n = 0 ; n < wave.count ; n++) {
@@ -777,32 +792,33 @@ if (cWIDTH > WIDTH){
       }
       rocks.enable(wave.rocks);
 
-        var attacks = [
-            {
-                attack: 'fire',
-                deg: '0'
-            },
-            {
-                attack: 'ice',
-                deg: '60'
-            },
-            {
-                attack: 'energy_ball',
-                deg: '120'
-            }
-        ];
+      for (var ak = 0; ak < this.attacks.length; ak++) {
+        var rotatoDeg = 180 / this.attacks.length * ak;
+        jq("#cn-wrapper .waveProgress." + this.attacks[ak].attack).css('transform', 'rotate(' + this.attacks[ak].deg + 'deg) skew(30deg) scale(0)');
+      }
 
-        for(var ak = 0 ; ak < attacks.length ; ak++){
-            var rotatoDeg = 180 / attacks.length * ak;
-            jq("#cn-wrapper .waveProgress." + attacks[ak].attack).css('transform','rotate('+attacks[ak].deg+'deg) skew(30deg) scale(0)');
-        }
-
-        jq("#cn-wrapper .attackBtn img").css('opacity',0.25);
-        jq("#cn-wrapper .attackBtn." + wave.acceptAttack + ' img').css('opacity',1);
+      jq("#cn-wrapper .attackBtn a").css('background-color', 'hsla(0, 88%, 63%, 0.5)');
+      jq("#cn-wrapper .attackBtn img").css('opacity', 0.25);
+      jq("#cn-wrapper .attackBtn." + wave.acceptAttack + ' img').css('opacity', 1);
     },
 
     die: function(alien) {
       alien.dead = true;
+    },
+
+    nextWave: function() {
+      var index;
+      if (this.index < this.waves.length - 1) {
+        index = this.index + 1;
+      } else {
+        this.resetCycle();
+        index = 0;
+      }
+      this.startWave(index);
+    },
+
+    resetCycle: function() {
+      this.waves = this.shuffleArray(cfg.aliens);
     },
 
     update: function(dt) {
@@ -873,22 +889,26 @@ if (cWIDTH > WIDTH){
         this.moveframe = this.moveframe ? this.moveframe : 0;
 
         if(this.moveframe > wave.totalMove / 4){
-            if(this.moveframe % 10 === 1 && this.moveframe !== wave.totalMove) {
-                this.nextWaveAttackSeeThrough = !this.nextWaveAttackSeeThrough;
-                if (this.nextWaveAttackSeeThrough) {
-                    var alpha = 0.25;
-                } else {
-                    var alpha = 1;
-                }
-                var nextIndex = this.index < this.waves.length-1 ? this.index + 1 : 0;
-                var nextAcceptAttack = this.waves[nextIndex].acceptAttack[0];
-                jq("#cn-wrapper .attackBtn." + nextAcceptAttack + ' img').css('opacity',alpha);
-            }else if(this.moveframe === wave.totalMove){
-                var alpha = 1;
-                var nextIndex = this.index < this.waves.length-1 ? this.index + 1 : 0;
-                var nextAcceptAttack = this.waves[nextIndex].acceptAttack[0];
-                jq("#cn-wrapper .attackBtn." + nextAcceptAttack + ' img').css('opacity',alpha);
+          var nextIndex = this.index < this.waves.length - 1 ? this.index + 1 : 0;
+          var nextAcceptAttack = this.waves[nextIndex].acceptAttack[0];
+
+          if (this.moveframe % 10 === 1 && this.moveframe !== wave.totalMove) {
+            this.nextWaveAttackSeeThrough = !this.nextWaveAttackSeeThrough;
+            if (this.nextWaveAttackSeeThrough) {
+              var alpha = 0.25;
+              var background = 'hsla(0, 0%, 100%, 0.5)';
+            } else {
+              var alpha = 1;
+              var background = 'hsla(0, 88%, 63%, 0.5)';
             }
+          } else if (this.moveframe >= wave.totalMove) {
+            var alpha = 1;
+            var background = 'hsla(0, 88%, 63%, 0.5)';
+          }
+          // console.log('this.moveframe: '+ this.moveframe + "/" + wave.totalMove + '/' + nextAcceptAttack)
+          // console.log('background: ' + background)
+          jq("#cn-wrapper .attackBtn." + nextAcceptAttack + ' img').css('opacity', alpha);
+          jq("#cn-wrapper .attackBtn." + nextAcceptAttack + ' a').css('background-color', background);
         }
 
 
@@ -898,73 +918,31 @@ if (cWIDTH > WIDTH){
 
             var rotatoDeg, acceptAttack, attackClass, scale;
             acceptAttack = this.waves[this.index].acceptAttack[0];
-            // console.log(acceptAttack);
-            var attacks = [
-                {
-                    attack: 'fire',
-                    deg: '0'
-                },
-                {
-                    attack: 'ice',
-                    deg: '60'
-                },
-                {
-                    attack: 'energy_ball',
-                    deg: '120'
-                }
-            ];
-            var attack = attacks.filter(function (a) { return a.attack == acceptAttack });
+
+            var attack = this.attacks.filter(function (a) { return a.attack == acceptAttack });
             jq("#cn-wrapper .waveProgress." + attack[0].attack).css('transform','rotate('+attack[0].deg+'deg) skew(30deg) scale('+finishedParcentage+')');
-
-
-            // if(acceptAttack !== 'fire'){
-            //     rotatoDeg = 0;
-            //     jq("#cn-wrapper .waveProgress.fire").css('transform','rotate('+rotatoDeg+'deg) skew(30deg) scale(0)');
-            // }
-            // if(acceptAttack !== 'ice'){
-            //     rotatoDeg = 60;
-            //     jq("#cn-wrapper .waveProgress.ice").css('transform','rotate('+rotatoDeg+'deg) skew(30deg) scale(0)');
-            // }
-            // if(acceptAttack !== 'energy_ball'){
-            //     rotatoDeg = 120;
-            //     jq("#cn-wrapper .waveProgress.energy_ball").css('transform','rotate('+rotatoDeg+'deg) skew(30deg) scale(0)');
-            // }
-            // if(acceptAttack === 'fire'){
-            //     rotatoDeg = 0;
-            // }else if(acceptAttack === 'ice'){
-            //     rotatoDeg = 60;
-            // }else if(acceptAttack === 'energy_ball'){
-            //     rotatoDeg = 120;
-            // }
-            // jq("#cn-wrapper .waveProgress." + acceptAttack).css('transform','rotate('+rotatoDeg+'deg) skew(30deg) scale('+finishedParcentage+')');
         }
 
         if (endOfWave) {
 
-            var alpha = 1;
-            var nextIndex = this.index < this.waves.length-1 ? this.index + 1 : 0;
-            var nextAcceptAttack = this.waves[nextIndex].acceptAttack[0];
-            jq("#cn-wrapper .attackBtn img").css('opacity',0.25);
-            jq("#cn-wrapper .attackBtn." + nextAcceptAttack + ' img').css('opacity',alpha);
+          var alpha = 1;
+          var background = 'hsla(0, 88%, 63%, 0.5)';
+          var nextIndex = this.index < this.waves.length - 1 ? this.index + 1 : 0;
+          var nextAcceptAttack = this.waves[nextIndex].acceptAttack[0];
+          jq("#cn-wrapper .attackBtn img").css('opacity', 0.25);
+          jq("#cn-wrapper .attackBtn." + nextAcceptAttack + ' img').css('opacity', alpha);
+          jq("#cn-wrapper .attackBtn a").css('background-color', 'hsla(0, 88%, 63%, 0.5)');
 
             aliens.firstAlienMove = false;
             aliens.moveframe = 0;
-            // if(acceptAttack === 'fire'){
-            //     rotatoDeg = 0;
-            // }else if(acceptAttack === 'ice'){
-            //     rotatoDeg = 60;
-            // }else if(acceptAttack === 'energy_ball'){
-            //     rotatoDeg = 120;
-            // }
-            // jq("#cn-wrapper .waveProgress." + acceptAttack).css('transform','rotate('+rotatoDeg+'deg) skew(30deg) scale(0)');
 
 
         if (player.dead && player.lives) {
           // player.reset();
-          this.startWave(this.index < this.waves.length-1 ? this.index + 1 : 0);
+          this.nextWave();
         }
         else if (!player.dead) {
-          this.startWave(this.index < this.waves.length-1 ? this.index + 1 : 0);
+          this.nextWave();
         }
       }
     },
@@ -1393,111 +1371,121 @@ if (cWIDTH > WIDTH){
 
   cfg.aliens = [
 
-      //
+    //ghost fire
     Pattern.construct({ alien: 3, y: 'middle', acceptAttack: ['ice'] }, [
-      Pattern.straight(20,   -500,    0),
-      Pattern.straight(30,   -500, -300),
-      Pattern.straight(30,      0,  300),
-      Pattern.straight(null, -500,    0)
+      Pattern.straight(20,   -375,    0),
+      Pattern.straight(30,   -375, -225),
+      Pattern.straight(30,      0,  225),
+      Pattern.straight(null, -375,    0)
     ]),
 
+    //ghost fire
     Pattern.construct({ alien: 3, y: 'bottom', rocks: true, acceptAttack: ['ice'] }, [
-      Pattern.straight(20,   -500,    0),
-      Pattern.straight(30,   -500, -300),
-      Pattern.straight(30,      0,  300),
-      Pattern.straight(null, -500,    0)
+      Pattern.straight(20,   -375,    0),
+      Pattern.straight(30,   -375, -225),
+      Pattern.straight(30,      0,  225),
+      Pattern.straight(null, -375,    0)
     ]),
 
-      //ghost fire
+    //ghost fire
     Pattern.construct({ alien: 3, y: 'top', rocks: true, acceptAttack: ['ice'] }, [
-      Pattern.straight(20,   -500,    0),
-      Pattern.straight(30,   -500,  300),
-      Pattern.straight(30,      0, -300),
-      Pattern.straight(null, -500,    0)
+      Pattern.straight(20,   -375,    0),
+      Pattern.straight(30,   -375,  225),
+      Pattern.straight(30,      0, -225),
+      Pattern.straight(null, -375,    0)
     ]),
 
       //phantom
     Pattern.construct({ alien: 1, count: 10, stagger: 8, y: 'middle', defend: true, acceptAttack: ['energy_ball'] }, [
-      Pattern.straight(60, -500, 0),
-      Pattern.rotate(-360, 500, 0, -150),
-      Pattern.straight(10, -500, 0),
-      Pattern.rotate( 360, 500, 0,  150),
-      Pattern.straight(null, -500, 0)
+      Pattern.straight(75, -375, 0),
+      Pattern.rotate(-360, 375, 0, -150),
+      Pattern.straight(10, -375, 0),
+      Pattern.rotate( 360, 375, 0,  150),
+      Pattern.straight(null, -375, 0)
     ]),
 
       //pumpkin
     Pattern.construct({ alien: 2, y: 'top', acceptAttack: ['fire'] }, [
-      Pattern.straight(60, -500, 0),
-      Pattern.rotate(720, 500, 0, 300),
-      Pattern.straight(null, -500, 0)
+      Pattern.straight(60, -375, 0),
+      Pattern.rotate(720, 375, 0, 225),
+      Pattern.straight(null, -375, 0)
     ]),
 
+    //phantom
     Pattern.construct({ alien: 1, y: 'middle', acceptAttack: ['energy_ball'] }, [
-      Pattern.straight(10, -400, 0),
-      Pattern.rotate( 180, 400, -120, 0),
-      Pattern.rotate(-180, 400, -120, 0),
-      Pattern.rotate( 180, 400, -120, 0),
-      Pattern.rotate(-180, 400, -120, 0),
-      Pattern.rotate( 180, 400, -120, 0),
-      Pattern.rotate(-180, 400, -120, 0),
-      Pattern.straight(null, -400, 0)
+      Pattern.straight(10, -300, 0),
+      Pattern.rotate( 180, 225, -120, 0),
+      Pattern.rotate(-180, 225, -120, 0),
+      Pattern.rotate( 180, 225, -120, 0),
+      Pattern.rotate(-180, 225, -120, 0),
+      Pattern.rotate( 180, 225, -120, 0),
+      Pattern.rotate(-180, 225, -120, 0),
+      Pattern.straight(null, -300, 0)
     ]),
 
+    //pumpkin
     Pattern.construct({ alien: 2, y: 'bottom', acceptAttack: ['fire'] }, [
-      Pattern.straight(60, -500, 0),
-      Pattern.rotate(-720, 500, 0, -300),
-      Pattern.straight(null, -500, 0)
+      Pattern.straight(60, -375, 0),
+      Pattern.rotate(-720, 375, 0, -225),
+      Pattern.straight(null, -375, 0)
     ]),
 
+    //ghost fire
     Pattern.construct({ alien: 3, y: 'bottom', count: 10, stagger: 9, rocks: true, acceptAttack: ['ice'] }, [
-      Pattern.straight(60,   -300,    0),
-      Pattern.straight(60,      0, -450),
-      Pattern.straight(20,   -300,    0),
-      Pattern.straight(60,      0,  450),
-      Pattern.straight(20,   -300,    0),
-      Pattern.straight(60,      0, -450),
-      Pattern.straight(20,   -300,    0),
-      Pattern.straight(60,      0,  450),
-      Pattern.straight(20,   -300,    0),
-      Pattern.straight(60,      0, -450),
-      Pattern.straight(20,   -300,    0),
-      Pattern.straight(60,      0,  450),
-      Pattern.straight(null, -300,    0)
+      Pattern.straight(60,   -225,    0),
+      Pattern.straight(60,      0, -400),
+      Pattern.straight(20,   -225,    0),
+      Pattern.straight(60,      0,  400),
+      Pattern.straight(20,   -225,    0),
+      Pattern.straight(60,      0, -400),
+      Pattern.straight(20,   -225,    0),
+      Pattern.straight(60,      0,  400),
+      Pattern.straight(20,   -225,    0),
+      Pattern.straight(60,      0, -400),
+      Pattern.straight(20,   -225,    0),
+      Pattern.straight(60,      0,  400),
+      Pattern.straight(null, -225,    0)
     ]),
 
+    //phantom
     Pattern.construct({ alien: 1, x: WIDTH-200, y: 'below', defend: true, acceptAttack: ['energy_ball'] }, [
-      Pattern.straight(60, 0, -500),
-      Pattern.rotate(360, 500, -200, 0),
-      Pattern.straight(null, 0, -500)
+      Pattern.straight(60, 0, -375),
+      Pattern.rotate(360, 375, -150, 0),
+      Pattern.straight(null, 0, -375)
     ]),
 
+    //phantom
     Pattern.construct({ alien: 1, x: WIDTH-200, y: 'above', defend: true, acceptAttack: ['energy_ball'] }, [
-      Pattern.straight(120, 0, 500),
-      Pattern.rotate(-360, 500, -200, 0),
-      Pattern.straight(null, 0, 500)
+      Pattern.straight(120, 0, 375),
+      Pattern.rotate(-360, 375, -150, 0),
+      Pattern.straight(null, 0, 375)
     ]),
 
-    Pattern.construct({ alien: 2, x: 'after', y: 'top', count: 12, rocks: true, acceptAttack: ['fire'] }, [
-      Pattern.straight(5, -800, 0),
+    //pumpkin
+    Pattern.construct({ alien: 2, x: 'after', y: 'top', count: 12, rocks: true, defend: true, acceptAttack: ['fire'] }, [
+      Pattern.straight(5, -600, 0),
       Pattern.rotate(360, 600, 0, 220, { dx: -80, dy: 0 })
     ]),
 
+    //pumpkin
     Pattern.construct({ alien: 2, x: WIDTH-200, y: 'below', acceptAttack: ['fire'] }, [
-      Pattern.straight(60, 0, -500),
-      Pattern.straight(null, -800, -200)
+      Pattern.straight(60, 0, -375),
+      Pattern.straight(null, -600, -150)
     ]),
 
+    //pumpkin
     Pattern.construct({ alien: 2, x: WIDTH-200, y: 'above', acceptAttack: ['fire'] }, [
-      Pattern.straight(60, 0, 500),
-      Pattern.straight(null, -800, 200)
+      Pattern.straight(60, 0, 375),
+      Pattern.straight(null, -600, 150)
     ]),
 
+    //pumpkin
     Pattern.construct({ alien: 2, y: 'top', count: 30, rocks: true, acceptAttack: ['fire'] }, [
       Pattern.straight(110, -100, 0),
-      Pattern.rotate(180, 500, 0, 250),
-      Pattern.straight(60,  500, 0),
-      Pattern.rotate(180, 500, 0, -250),
-      Pattern.straight(100, -500, 0)
+      Pattern.rotate(180, 375, 0, 250),
+      Pattern.straight(60,  375, 0),
+      Pattern.rotate(180, 375, 0, -250),
+      Pattern.straight(100, -375, 0)
     ])
 
   ];

@@ -308,10 +308,6 @@ items should be rotated by x, minus (sum of angles - 180)2s (for this demo) */
     transform: rotate(120deg) skew(30deg)
 }
 
-.cn-wrapper li a .progress {
-    background-color: RGBA(255, 255, 255, 0.5);
-}
-
 .cn-wrapper li:nth-child(odd) a {
     /*background-color: #a11313;*/
     background-color: hsla(0, 88%, 63%, 0.5);
@@ -330,6 +326,10 @@ items should be rotated by x, minus (sum of angles - 180)2s (for this demo) */
 
 .cn-wrapper a.active {
     box-shadow: 1px 1px 33px 4px rgba(255,255,255,1);
+}
+
+.cn-wrapper .waveProgress a {
+    background-color: rgba(255, 255, 255, 0.75)!important;
 }
 
 
