@@ -6,12 +6,12 @@ var Delta = function(morganaId) {
   // CONSTANTS
   //===============================================================================================
 var cWIDTH = window.innerWidth
-        || document.documentElement.clientWidth
-        || document.body.clientWidth;
+          || document.documentElement.clientWidth
+          || document.body.clientWidth;
 
 var cHEIGHT = window.innerHeight
-    || document.documentElement.clientHeight
-    || document.body.clientHeight;
+           || document.documentElement.clientHeight
+           || document.body.clientHeight;
 
 var HEIGHT = cHEIGHT;
 var WIDTH = HEIGHT /16*9;
@@ -30,7 +30,7 @@ if (cWIDTH > WIDTH){
       COOLDOWN = 15,
       alienCOOLDOWN = 60,
       jumpCOOLDOWN = 1,
-      // godCooldown = 180,
+      // godCooldown = 10000000,
       godCooldown = 180,
       reviveCooldown = 60,
       pressedUp = false,
@@ -42,6 +42,7 @@ if (cWIDTH > WIDTH){
       PLAYER   = { X: 50, Y: 150, W: 128,  H: 128, BULLET_SPEED: 1000 },
       ALIEN    = {                W: 32,  H: 32, BULLET_SPEED: { MIN: 400, MAX: 600 } },
       ROCK     = {                W: 256, H: 128, DX: -375 },
+      playerBullets   = ['fire', 'ice', 'energy_ball'],
       playerCanvas, playerCtx
 
 
@@ -67,7 +68,7 @@ if (cWIDTH > WIDTH){
       { id: "rocks",   url: "images/rocks.png"   },
       { id: "bullets", url: "images/bullets.png" },
       { id: "player", url: "images/bullets.png" },
-      { id: "player1", url: "images/morgana/"+morganaId+".png" },
+      { id: "player1", url: "images/morgana/" + morganaId + ".png" },
       { id: "bg_Mo_fair", url: "images/bg_Mo_fair.png" },
       { id: "bg_Mo_middle", url: "images/bg_Mo_middle.png" },
       { id: "bg_Mo_close", url: "images/bg_Mo_close.png" },
@@ -94,10 +95,13 @@ if (cWIDTH > WIDTH){
     },
 
     keys: [
-      { key: Game.Key.SPACE,                    mode: 'up',   state: 'title',                  action: function() { engine.start();             } },
-      { key: Game.Key.ESC,                      mode: 'up',   state: 'playing',                action: function() { engine.quit();              } },
-      { key: [Game.Key.SPACE],      mode: 'down', state: ['preparing', 'playing'], action: function() { player.movingUp    = pressedUp ? false : true;  pressedUp = true; } },
-      { key: [Game.Key.SPACE],      mode: 'up',   state: ['preparing', 'playing'], action: function() { player.movingUp    = false; pressedUp = false;} },
+      { key: Game.Key.SPACE,    mode: 'up',   state: 'title',                  action: function() { engine.start();             } },
+      { key: Game.Key.ESC,      mode: 'up',   state: 'playing',                action: function() { engine.quit();              } },
+      { key: [Game.Key.SPACE],  mode: 'down', state: ['preparing', 'playing'], action: function() { player.movingUp    = pressedUp ? false : true;  pressedUp = true; } },
+      { key: [Game.Key.SPACE],  mode: 'up',   state: ['preparing', 'playing'], action: function() { player.movingUp    = false; pressedUp = false;} },
+      { key: [Game.Key.ONE],    mode: 'up',   state: ['preparing', 'playing'], action: function() { player.setBullet('fire')} },
+      { key: [Game.Key.TWO],    mode: 'up',   state: ['preparing', 'playing'], action: function() { player.setBullet('ice');} },
+      { key: [Game.Key.THREE],  mode: 'up',   state: ['preparing', 'playing'], action: function() { player.setBullet('energy_ball');} },
     ],
 
     stars: [
@@ -110,58 +114,7 @@ if (cWIDTH > WIDTH){
 
     sprites: {
 
-      player: { fps: 20, frames: [
-                                  { x: 0, y: 0, w: 101, h: 101 },
-                                  { x: 0, y: 0, w: 101, h: 101 },
-                                  { x: 0, y: 0, w: 101, h: 101 },
-                                  { x: 0, y: 0, w: 101, h: 101 },
-                                  { x: 0, y: 0, w: 101, h: 101 },
-                                  { x: 0, y: 0, w: 101, h: 101 },
-                                  { x: 0, y: 0, w: 101, h: 101 },
-                                  { x: 0, y: 0, w: 101, h: 101 },
-                                  { x: 0, y: 0, w: 101, h: 101 },
-                                  { x: 0, y: 0, w: 101, h: 101 },
-                                  { x: 0, y: 0, w: 101, h: 101 },
-                                  { x: 0, y: 0, w: 101, h: 101 },
-                                  { x: 0, y: 0, w: 101, h: 101 },
-                                  { x: 0, y: 0, w: 101, h: 101 },
-                                  { x: 0, y: 0, w: 101, h: 101 },
-                                  { x: 0, y: 0, w: 101, h: 101 },
-                                  { x: 0, y: 0, w: 101, h: 101 },
-                                  { x: 0, y: 0, w: 101, h: 101 },
-                                  { x: 0, y: 0, w: 101, h: 101 },
-                                  { x: 0, y: 0, w: 101, h: 101 },
-                                  { x: 0, y: 0, w: 101, h: 101 },
-                                  { x: 0, y: 0, w: 101, h: 101 },
-                                  { x: 0, y: 0, w: 101, h: 101 },
-                                  { x: 0, y: 0, w: 101, h: 101 },
-                                  { x: 0, y: 0, w: 101, h: 101 },
-                                  { x: 0, y: 0, w: 101, h: 101 },
-                                  { x: 0, y: 0, w: 101, h: 101 },
-                                  { x: 0, y: 0, w: 101, h: 101 },
-                                  { x: 0, y: 0, w: 101, h: 101 },
-                                  { x: 0, y: 0, w: 101, h: 101 },
-                                  { x: 0, y: 0, w: 101, h: 101 },
-                                  { x: 0, y: 0, w: 101, h: 101 },
-                                  { x: 0, y: 0, w: 101, h: 101 },
-                                  { x: 0, y: 0, w: 101, h: 101 },
-                                  { x: 0, y: 0, w: 101, h: 101 },
-                                  { x: 0, y: 0, w: 101, h: 101 },
-                                  { x: 0, y: 0, w: 101, h: 101 },
-                                  { x: 0, y: 0, w: 101, h: 101 },
-                                  { x: 0, y: 0, w: 101, h: 101 },
-                                  { x: 0, y: 0, w: 101, h: 101 },
-                                  { x: 0, y: 0, w: 101, h: 101 },
-                                  { x: 0, y: 0, w: 101, h: 101 },
-                                  { x: 0, y: 0, w: 101, h: 101 },
-                                  { x: 0, y: 0, w: 101, h: 101 },
-                                  { x: 0, y: 0, w: 101, h: 101 },
-                                  { x: 0, y: 0, w: 101, h: 101 },
-                                  { x: 0, y: 0, w: 101, h: 101 },
-                                  { x: 0, y: 0, w: 101, h: 101 },
-                                  { x: 0, y: 0, w: 101, h: 101 },
-                                  { x: 0, y: 0, w: 101, h: 101 },
-      ] },
+      player: { fps: 20, frames: Array(50).fill({ x: 0, y: 0, w: 101, h: 101 }) },
 
       thrust: { fps: 20, frames: [ { x: 134, y: 18, w: 32, h: 32 },
                                    { x: 167, y: 18, w: 32, h: 32 },
@@ -350,6 +303,15 @@ if (cWIDTH > WIDTH){
       }
     }, false);
 
+    jq('#cn-wrapper a').on('click', function (event) {
+      // console.log(event.target);
+      player.setBullet(jq(event.target).data("attack"));
+    });
+
+    jq('#cn-wrapper a img').on('click', function (event) {
+      jq(event.target).parent('a').click();
+    });
+
   }
 
   //===============================================================================================
@@ -390,9 +352,9 @@ if (cWIDTH > WIDTH){
 
     onenterbooting:   function() { $('booting').show();                                              },
     onleavebooting:   function() { $('booting').hide();                                              },
-    onentertitle:     function() { $('title').fadein();  $('start').show(); sounds.playTitleMusic(); window.closeNav(); $('cn-wrapper').fadeout(); $('cn-button').fadeout();  },
-    onleavetitle:     function() { $('title').fadeout(); $('start').hide();                          },
-    onenterpreparing: function() { $('prepare').fadein(); sounds.playGameMusic();$('cn-wrapper').show();$('cn-button').fadein();window.openNav();                  },
+    onentertitle:     function() { $('title').fadein();  $('start').show(); sounds.playTitleMusic(); window.closeNav(); $('cn-wrapper').hide();  },
+    onleavetitle:     function() { $('title').fadeout(); $('start').hide();   },
+    onenterpreparing: function() { $('prepare').fadein(); sounds.playGameMusic();$('cn-wrapper').show();window.openNav();                  },
     onleavepreparing: function() { $('prepare').fadeout(); },
 
     onenterstate: function(event, from, to) {
@@ -601,7 +563,6 @@ if (cWIDTH > WIDTH){
             this.godMode = false;
         }
 
-        // console.log(this.movingUp);
       }
 
         if (this.dead && this.reviveCooldown > 0 && this.lives > 0){
@@ -622,6 +583,14 @@ if (cWIDTH > WIDTH){
                 setTimeout(engine.quit.bind(engine), 4000);
             }
         }
+    },
+
+    setBullet: function(bullet){
+      if (playerBullets.indexOf(bullet) !== -1){
+        this.attack = bullet;
+        jq('#cn-wrapper a').removeClass("active");
+        jq('#cn-wrapper .attackBtn.' + bullet + ' a').addClass("active");
+      }
     }
 
   });
@@ -666,7 +635,6 @@ if (cWIDTH > WIDTH){
 
     update: function(dt) {
 
-        // console.log(this.image);
       var n, max, bullet;
       for(n = 0, max = this.pool.allocated() ; n < max ; n++) {
         bullet = this.pool.store[n];
@@ -745,13 +713,13 @@ if (cWIDTH > WIDTH){
   var Aliens = Class.create({
 
     reset: function() {
-      this.waves = cfg.aliens;
+      this.cycle = 1;
+      this.waves = this.getAliens(this.cycle);
       this.startWave(0);
-      jq("#cn-wrapper .attackBtn." + this.waves[0].acceptAttack + ' a').click();
+      player.setBullet(this.waves[0].acceptAttack[0]);
     },
 
     startWave: function(index) {
-
       this.index  = index;
       this.frame  = 0;
       this.aliens = [];
@@ -818,7 +786,25 @@ if (cWIDTH > WIDTH){
     },
 
     resetCycle: function() {
-      this.waves = this.shuffleArray(cfg.aliens);
+      var cycleAliens;
+
+      if(this.cycle < 4){
+        this.cycle++;
+      }else{
+        this.cycle = 4;
+      }
+
+      cycleAliens = this.getAliens(this.cycle);
+
+      if(this.cycle === 2 || this.cycle === 4){
+        this.waves = this.shuffleArray(cycleAliens);
+      }else{
+        this.waves = cycleAliens;
+      }
+    },
+
+    getAliens: function(cycle){
+      return cfg.aliens.filter(function (a) { return a.cycle.indexOf(cycle) !== -1 });
     },
 
     update: function(dt) {
@@ -905,8 +891,6 @@ if (cWIDTH > WIDTH){
             var alpha = 1;
             var background = 'hsla(0, 88%, 63%, 0.5)';
           }
-          // console.log('this.moveframe: '+ this.moveframe + "/" + wave.totalMove + '/' + nextAcceptAttack)
-          // console.log('background: ' + background)
           jq("#cn-wrapper .attackBtn." + nextAcceptAttack + ' img').css('opacity', alpha);
           jq("#cn-wrapper .attackBtn." + nextAcceptAttack + ' a').css('background-color', background);
         }
@@ -919,7 +903,7 @@ if (cWIDTH > WIDTH){
             var rotatoDeg, acceptAttack, attackClass, scale;
             acceptAttack = this.waves[this.index].acceptAttack[0];
 
-            var attack = this.attacks.filter(function (a) { return a.attack == acceptAttack });
+            var attack = this.attacks.filter(function (a) { return a.attack === acceptAttack });
             jq("#cn-wrapper .waveProgress." + attack[0].attack).css('transform','rotate('+attack[0].deg+'deg) skew(30deg) scale('+finishedParcentage+')');
         }
 
@@ -1052,7 +1036,6 @@ if (cWIDTH > WIDTH){
           y:     layer.y,
           image: layer.image
         });
-        // console.log(stars);
       }
       return stars;
     },
@@ -1067,14 +1050,11 @@ if (cWIDTH > WIDTH){
 
     update: function(dt) {
       var star, n, max = this.stars.length;
-      // console.log(stars);
       for(n = 0 ; n < max ; n++) {
         star = this.stars[n];
         star.x = star.x - (star.speed * dt);
-        // console.log(star.x);
 
         if (star.x <= -1052){
-          // console.log("------------");
           this.repositionStar(star);
         }
       }
@@ -1110,12 +1090,6 @@ if (cWIDTH > WIDTH){
       var star, n, max;
       for(n = 0, max = stars.stars.length ; n < max ; n++) {
         star = stars.stars[n];
-        // this.ctx.fillStyle = star.color;
-        // this.ctx.beginPath();
-        // this.ctx.arc(star.x - (dt * star.speed), star.y, star.size, 0, 2*Math.PI, true);
-        // this.ctx.fill();
-        // this.ctx.closePath();
-        // console.log(this);
         this.ctx.drawImage(this.images[star.image], 0, 0, 1052, 744,
                                                     star.x - (dt * star.speed), star.y,
                                                     1052, HEIGHT
@@ -1128,7 +1102,6 @@ if (cWIDTH > WIDTH){
       var sprite = player.sprite,
            frame = sprite.frames[player.anim.frame],
           fixScale = 50;
-      // console.log(player.anim.frame);
         if(!playerCanvas){
             playerCanvas = document.createElement("canvas");
             playerCtx=playerCanvas.getContext("2d");
@@ -1203,8 +1176,6 @@ if (cWIDTH > WIDTH){
         bullet = bullets.pool.store[n];
         sprite = bullet.sprite;
         frame  = sprite.frames[bullet.anim.frame];
-        // console.log(this.images[bullet.image])
-        // console.log(bullet.image)
         this.ctx.drawImage(this.images[bullet.image], frame.x,  frame.y,  frame.w,     frame.h,
                                                 bullet.x + (dt * bullet.speed), bullet.y, bullet.size, bullet.size);
       }
@@ -1302,6 +1273,7 @@ if (cWIDTH > WIDTH){
       options.sprite  = this.sprite(options);
       options.moves   = moves;
       options.totalMove = this.totalMove(moves);
+      options.cycle = options.cycle || [1,2];
       return options;
     },
 
@@ -1369,34 +1341,35 @@ if (cWIDTH > WIDTH){
 
   //===============================================================================================
 
+  // start cfg.alien
   cfg.aliens = [
 
-    //ghost fire
-    Pattern.construct({ alien: 3, y: 'middle', acceptAttack: ['ice'] }, [
+    //ghost fire - middle
+    Pattern.construct({ cycle: [1,2], alien: 3, y: 'middle', acceptAttack: ['ice'] }, [
       Pattern.straight(20,   -375,    0),
       Pattern.straight(30,   -375, -225),
       Pattern.straight(30,      0,  225),
       Pattern.straight(null, -375,    0)
     ]),
 
-    //ghost fire
-    Pattern.construct({ alien: 3, y: 'bottom', rocks: true, acceptAttack: ['ice'] }, [
+    //ghost fire - bottom (left up, straight down, straight left)
+    Pattern.construct({ cycle: [1,2], alien: 3, y: 'bottom', rocks: true, acceptAttack: ['ice'] }, [
       Pattern.straight(20,   -375,    0),
-      Pattern.straight(30,   -375, -225),
-      Pattern.straight(30,      0,  225),
+      Pattern.straight(30,   -375, -400),
+      Pattern.straight(30,      0,  200),
       Pattern.straight(null, -375,    0)
     ]),
 
-    //ghost fire
-    Pattern.construct({ alien: 3, y: 'top', rocks: true, acceptAttack: ['ice'] }, [
+    //ghost fire - top
+    Pattern.construct({ cycle: [1,2], alien: 3, y: 'top', rocks: true, acceptAttack: ['ice'] }, [
       Pattern.straight(20,   -375,    0),
-      Pattern.straight(30,   -375,  225),
-      Pattern.straight(30,      0, -225),
+      Pattern.straight(30,   -375,  400),
+      Pattern.straight(30,      0, -200),
       Pattern.straight(null, -375,    0)
     ]),
 
       //phantom
-    Pattern.construct({ alien: 1, count: 10, stagger: 8, y: 'middle', defend: true, acceptAttack: ['energy_ball'] }, [
+    Pattern.construct({ cycle: [1,2], alien: 1, count: 10, stagger: 8, y: 'middle', defend: true, acceptAttack: ['energy_ball'] }, [
       Pattern.straight(75, -375, 0),
       Pattern.rotate(-360, 375, 0, -150),
       Pattern.straight(10, -375, 0),
@@ -1404,15 +1377,15 @@ if (cWIDTH > WIDTH){
       Pattern.straight(null, -375, 0)
     ]),
 
-      //pumpkin
-    Pattern.construct({ alien: 2, y: 'top', acceptAttack: ['fire'] }, [
-      Pattern.straight(60, -375, 0),
-      Pattern.rotate(720, 375, 0, 225),
+    //pumpkin
+    Pattern.construct({ cycle: [1,2], alien: 2, y: 'top', acceptAttack: ['fire'] }, [
+      Pattern.straight(90, -375, 0),
+      Pattern.rotate(720, 350, 0, 300),
       Pattern.straight(null, -375, 0)
     ]),
 
     //phantom
-    Pattern.construct({ alien: 1, y: 'middle', acceptAttack: ['energy_ball'] }, [
+    Pattern.construct({ cycle: [1,2], alien: 1, y: 'middle', acceptAttack: ['energy_ball'] }, [
       Pattern.straight(10, -300, 0),
       Pattern.rotate( 180, 225, -120, 0),
       Pattern.rotate(-180, 225, -120, 0),
@@ -1424,14 +1397,14 @@ if (cWIDTH > WIDTH){
     ]),
 
     //pumpkin
-    Pattern.construct({ alien: 2, y: 'bottom', acceptAttack: ['fire'] }, [
-      Pattern.straight(60, -375, 0),
-      Pattern.rotate(-720, 375, 0, -225),
+    Pattern.construct({ cycle: [1,2], alien: 2, y: 'bottom', acceptAttack: ['fire'] }, [
+      Pattern.straight(90, -375, 0),
+      Pattern.rotate(-720, 350, 0, -300),
       Pattern.straight(null, -375, 0)
     ]),
 
     //ghost fire
-    Pattern.construct({ alien: 3, y: 'bottom', count: 10, stagger: 9, rocks: true, acceptAttack: ['ice'] }, [
+    Pattern.construct({ cycle: [1,2], alien: 3, y: 'bottom', count: 10, stagger: 9, rocks: true, acceptAttack: ['ice'] }, [
       Pattern.straight(60,   -225,    0),
       Pattern.straight(60,      0, -400),
       Pattern.straight(20,   -225,    0),
@@ -1448,47 +1421,172 @@ if (cWIDTH > WIDTH){
     ]),
 
     //phantom
-    Pattern.construct({ alien: 1, x: WIDTH-200, y: 'below', defend: true, acceptAttack: ['energy_ball'] }, [
-      Pattern.straight(60, 0, -375),
-      Pattern.rotate(360, 375, -150, 0),
+    Pattern.construct({ cycle: [1,2], alien: 1, x: WIDTH-200, y: 'below', defend: true, acceptAttack: ['energy_ball'] }, [
+      Pattern.straight(90, 0, -400),
+      Pattern.rotate(360, 375, -200, 0),
       Pattern.straight(null, 0, -375)
     ]),
 
     //phantom
-    Pattern.construct({ alien: 1, x: WIDTH-200, y: 'above', defend: true, acceptAttack: ['energy_ball'] }, [
-      Pattern.straight(120, 0, 375),
-      Pattern.rotate(-360, 375, -150, 0),
+    Pattern.construct({ cycle: [1,2], alien: 1, x: WIDTH-200, y: 'above', defend: true, acceptAttack: ['energy_ball'] }, [
+      Pattern.straight(90, 0, 400),
+      Pattern.rotate(-360, 375, -200, 0),
       Pattern.straight(null, 0, 375)
     ]),
 
     //pumpkin
-    Pattern.construct({ alien: 2, x: 'after', y: 'top', count: 12, rocks: true, defend: true, acceptAttack: ['fire'] }, [
+    Pattern.construct({ cycle: [1,2], alien: 2, x: 'after', y: 'top', count: 12, rocks: true, defend: true, acceptAttack: ['fire'] }, [
       Pattern.straight(5, -600, 0),
       Pattern.rotate(360, 600, 0, 220, { dx: -80, dy: 0 })
     ]),
 
-    //pumpkin
-    Pattern.construct({ alien: 2, x: WIDTH-200, y: 'below', acceptAttack: ['fire'] }, [
+    //ghost fire
+    Pattern.construct({ cycle: [1,2], alien: 3, x: WIDTH-200, y: 'below', acceptAttack: ['ice'] }, [
       Pattern.straight(60, 0, -375),
       Pattern.straight(null, -600, -150)
     ]),
 
-    //pumpkin
-    Pattern.construct({ alien: 2, x: WIDTH-200, y: 'above', acceptAttack: ['fire'] }, [
+    //ghost fire
+    Pattern.construct({ cycle: [1,2], alien: 3, x: WIDTH-200, y: 'above', acceptAttack: ['ice'] }, [
       Pattern.straight(60, 0, 375),
       Pattern.straight(null, -600, 150)
     ]),
 
     //pumpkin
-    Pattern.construct({ alien: 2, y: 'top', count: 30, rocks: true, acceptAttack: ['fire'] }, [
+    Pattern.construct({ cycle: [1,2], alien: 2, y: 'top', count: 30, rocks: true, acceptAttack: ['fire'] }, [
       Pattern.straight(110, -100, 0),
       Pattern.rotate(180, 375, 0, 250),
       Pattern.straight(60,  375, 0),
       Pattern.rotate(180, 375, 0, -250),
       Pattern.straight(100, -375, 0)
+    ]),
+
+    // ============================================
+
+    // start cycle 3
+
+    // ============================================
+
+    //ghost fire
+    Pattern.construct({ cycle: [3,4], alien: 3, y: 'middle', acceptAttack: ['ice'] }, [
+      Pattern.straight(20,   -500,    0),
+      Pattern.straight(30,   -500, -300),
+      Pattern.straight(30,      0,  300),
+      Pattern.straight(null, -500,    0)
+    ]),
+
+    //ghost fire
+    Pattern.construct({ cycle: [3,4], alien: 3, y: 'bottom', rocks: true, acceptAttack: ['ice'] }, [
+      Pattern.straight(20,   -500,    0),
+      Pattern.straight(30,   -500, -300),
+      Pattern.straight(30,      0,  300),
+      Pattern.straight(null, -500,    0)
+    ]),
+
+    //ghost fire
+    Pattern.construct({ cycle: [3,4], alien: 3, y: 'top', rocks: true, acceptAttack: ['ice'] }, [
+      Pattern.straight(20,   -500,    0),
+      Pattern.straight(30,   -500,  300),
+      Pattern.straight(30,      0, -300),
+      Pattern.straight(null, -500,    0)
+    ]),
+
+    //phantom
+    Pattern.construct({ cycle: [3,4], alien: 1, count: 10, stagger: 8, y: 'middle', defend: true, acceptAttack: ['energy_ball'] }, [
+      Pattern.straight(60, -500, 0),
+      Pattern.rotate(-360, 500, 0, -150),
+      Pattern.straight(10, -500, 0),
+      Pattern.rotate( 360, 500, 0,  150),
+      Pattern.straight(null, -500, 0)
+    ]),
+
+    //pumpkin
+    Pattern.construct({ cycle: [3,4], alien: 2, y: 'top', acceptAttack: ['fire'] }, [
+      Pattern.straight(60, -500, 0),
+      Pattern.rotate(720, 500, 0, 300),
+      Pattern.straight(null, -500, 0)
+    ]),
+
+    //phantom
+    Pattern.construct({ cycle: [3,4], alien: 1, y: 'middle', acceptAttack: ['energy_ball'] }, [
+      Pattern.straight(10, -400, 0),
+      Pattern.rotate( 180, 400, -120, 0),
+      Pattern.rotate(-180, 400, -120, 0),
+      Pattern.rotate( 180, 400, -120, 0),
+      Pattern.rotate(-180, 400, -120, 0),
+      Pattern.rotate( 180, 400, -120, 0),
+      Pattern.rotate(-180, 400, -120, 0),
+      Pattern.straight(null, -400, 0)
+    ]),
+
+    //pumpkin
+    Pattern.construct({ cycle: [3,4], alien: 2, y: 'bottom', acceptAttack: ['fire'] }, [
+      Pattern.straight(60, -500, 0),
+      Pattern.rotate(-720, 500, 0, -300),
+      Pattern.straight(null, -500, 0)
+    ]),
+
+    //ghost fire
+    Pattern.construct({ cycle: [3,4], alien: 3, y: 'bottom', count: 10, stagger: 9, rocks: true, acceptAttack: ['ice'] }, [
+      Pattern.straight(60,   -300,    0),
+      Pattern.straight(60,      0, -450),
+      Pattern.straight(20,   -300,    0),
+      Pattern.straight(60,      0,  450),
+      Pattern.straight(20,   -300,    0),
+      Pattern.straight(60,      0, -450),
+      Pattern.straight(20,   -300,    0),
+      Pattern.straight(60,      0,  450),
+      Pattern.straight(20,   -300,    0),
+      Pattern.straight(60,      0, -450),
+      Pattern.straight(20,   -300,    0),
+      Pattern.straight(60,      0,  450),
+      Pattern.straight(null, -300,    0)
+    ]),
+
+    //phantom
+    Pattern.construct({ cycle: [3,4], alien: 1, x: WIDTH-200, y: 'below', defend: true, acceptAttack: ['energy_ball'] }, [
+      Pattern.straight(60, 0, -500),
+      Pattern.rotate(360, 500, -200, 0),
+      Pattern.straight(null, 0, -500)
+    ]),
+
+    //phantom
+    Pattern.construct({ cycle: [3,4], alien: 1, x: WIDTH-200, y: 'above', defend: true, acceptAttack: ['energy_ball'] }, [
+      Pattern.straight(120, 0, 500),
+      Pattern.rotate(-360, 500, -200, 0),
+      Pattern.straight(null, 0, 500)
+    ]),
+
+    //pumpkin
+    Pattern.construct({ cycle: [3,4], alien: 2, x: 'after', y: 'top', count: 12, rocks: true, acceptAttack: ['fire'] }, [
+      Pattern.straight(5, -800, 0),
+      Pattern.rotate(360, 600, 0, 220, { dx: -80, dy: 0 })
+    ]),
+
+    //ghost fire
+    Pattern.construct({ cycle: [3,4], alien: 3, x: WIDTH-200, y: 'below', acceptAttack: ['ice'] }, [
+      Pattern.straight(60, 0, -500),
+      Pattern.straight(null, -800, -200)
+    ]),
+
+    //ghost fire
+    Pattern.construct({ cycle: [3,4], alien: 3, x: WIDTH-200, y: 'above', acceptAttack: ['ice'] }, [
+      Pattern.straight(60, 0, 500),
+      Pattern.straight(null, -800, 200)
+    ]),
+
+    //pumpkin
+    Pattern.construct({ cycle: [3,4], alien: 2, y: 'top', count: 30, rocks: true, acceptAttack: ['fire'] }, [
+      Pattern.straight(110, -100, 0),
+      Pattern.rotate(180, 500, 0, 250),
+      Pattern.straight(60,  500, 0),
+      Pattern.rotate(180, 500, 0, -250),
+      Pattern.straight(100, -500, 0)
     ])
 
+    // end cfg.alien
   ];
+
 
     run.cfg      = cfg;
     run.engine   = engine;
@@ -1501,7 +1599,7 @@ if (cWIDTH > WIDTH){
 
     run();
 
-    return run;
+    // return run;
   //-----------------------------------------------------------------------------------------------
 
 };

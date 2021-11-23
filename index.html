@@ -184,29 +184,6 @@
 
     })();
 
-    jq('#cn-wrapper a').on('click', function (event) {
-        // console.log(event.target);
-        jq('#cn-wrapper a').removeClass("active");
-        jq(event.target).addClass("active");
-        jq(event.target).parent('a').addClass("active");
-        // setTimeout(clickPop, 100, event.target);
-        attack = jq(event.target).data("attack");
-        if (['fire', 'ice', 'energy_ball'].indexOf(attack) !== -1){
-            Delta2.player.attack = attack;
-        }
-    });
-
-    // function clickPop(identifier){
-    //     console.log('clickPop');
-    //     console.log(identifier);
-    //     jq(identifier).find('img').removeClass("cnClick");
-    // }
-
-    jq('#cn-wrapper a img').on('click', function (event) {
-        jq(event.target).parent('a').click();
-    });
-
-    var Delta2;
     var walletAddress = "";
     var appendedList = [];
     var runnging = false;
@@ -265,7 +242,7 @@
     function enterGame(morganaId) {
         document.getElementById('delta').style.display = 'contents';
         if (!runnging) {
-            Delta2 = Delta(morganaId);
+            Delta(morganaId);
             runnging = true;
         }
     }
