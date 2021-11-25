@@ -4,18 +4,34 @@ ini_set('max_execution_time', 0);
 
 // database
 require './config/config.php';
-require "./mintsList.php";
+//require "./mintsList.php";
 
 $addMode = true;
+$existMintList = [];
+$existMetadata = [];
 
-foreach ($NFTMintsList as $address) {
+$rs = mysqlQuery("SELECT * FROM nft_mint_list");
+if ($rs->result->num_rows > 0) {
+    $rows = mysqli_fetch_all($rs->result, MYSQLI_ASSOC);
+    $existMintList = array_column($rows, 'mintAddress');
+}
+
+$rs = mysqlQuery("SELECT * FROM nft_raw_data");
+if ($rs->result->num_rows > 0) {
+    $rows = mysqli_fetch_all($rs->result, MYSQLI_ASSOC);
+    $existMetadata = array_column($rows, 'mintAddress');
+}
+
+$newMintList = array_diff($existMintList, $existMetadata);
+
+foreach ($newMintList as $address) {
     unset($data);
 
-    $rs = mysqlQuery("SELECT * FROM nft_raw_data WHERE mintAddress = '{$address}'");
-
-    if ($rs->result->num_rows > 0 & $addMode === true) {
-        continue;
-    }
+//    $rs = mysqlQuery("SELECT * FROM nft_raw_data WHERE mintAddress = '{$address}'");
+//
+//    if ($rs->result->num_rows > 0 & $addMode === true) {
+//        continue;
+//    }
 
     $data = getPage2('https://api-mainnet.magiceden.io/rpc/getNFTByMintAddress/' . $address);
     $metadata_parsed = json_decode($data);
