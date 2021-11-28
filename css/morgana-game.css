@@ -177,7 +177,7 @@ body,body.modal-open {
 .cn-button {
     border: none;
     background: none;
-    color: #f06060;
+    color: #8df86b;
     text-align: center;
     font-size: 1.8em;
     padding-bottom: 1em;
@@ -197,7 +197,7 @@ body,body.modal-open {
 .cn-button:hover,
 .cn-button:active,
 .cn-button:focus {
-    color: #aa1010;
+    color: #27aa10;
 }
 
 .cn-wrapper li {
@@ -310,12 +310,12 @@ items should be rotated by x, minus (sum of angles - 180)2s (for this demo) */
 
 .cn-wrapper li:nth-child(odd) a {
     /*background-color: #a11313;*/
-    background-color: hsla(0, 88%, 63%, 0.5);
+    background-color: hsl(107, 83%, 66%);
 }
 
 .cn-wrapper li:nth-child(even) a {
     /*background-color: #a61414;*/
-    background-color: hsla(0, 88%, 65%, 0.5);
+    background-color: hsl(102, 84%, 63%);
 }
 
 /* active style */

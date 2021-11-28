@@ -1,3 +1,24 @@
+## v0.613 (2021-11-26)
+**Added Feature:**
+- redesign all enemies and background
+  - background add oval movement when set it oval on
+  - fix the gap between the background
+  - set interval for train background that not reposition immediately
+- update Morgana image to HD
+- add bullet animation
+- add individual death animation for enemies
+- change the color scheme
+
+**Fixed Bugs:**
+- N/a
+
+**New/Old Bugs:**
+- N/A
+
+**Added features to come**
+- Show player score before leaderboard
+
+
 ## v0.612 (2021-11-23)
 **Added Feature:**
 - Bind Key to select bullet

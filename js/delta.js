@@ -39,7 +39,7 @@ if (cWIDTH > WIDTH){
       dVSPEED  = 0,
       thrust   = 300,
       GRAVITY  = 10,
-      PLAYER   = { X: 50, Y: 150, W: 128,  H: 128, BULLET_SPEED: 1000 },
+      PLAYER   = { X: 50, Y: 150, W: 128,  H: 128, BULLET_SPEED: 500 },
       ALIEN    = {                W: 32,  H: 32, BULLET_SPEED: { MIN: 400, MAX: 600 } },
       ROCK     = {                W: 256, H: 128, DX: -375 },
       playerBullets   = ['fire', 'ice', 'energy_ball'],
@@ -64,7 +64,9 @@ if (cWIDTH > WIDTH){
 
     images: [
       { id: "sprites", url: "images/sprites.png" },
-      { id: "aliens",  url: "images/aliens.png"  },
+      { id: "alien1",  url: "images/alien1.png"  },
+      { id: "alien2",  url: "images/alien2.png"  },
+      { id: "alien3",  url: "images/alien3.png"  },
       { id: "rocks",   url: "images/rocks.png"   },
       { id: "bullets", url: "images/bullets.png" },
       { id: "player", url: "images/bullets.png" },
@@ -74,7 +76,18 @@ if (cWIDTH > WIDTH){
       { id: "bg_Mo_close", url: "images/bg_Mo_close.png" },
       { id: "energy_ball", url: "images/attack/energy_ball.png" },
       { id: "fire", url: "images/attack/fireball1.png" },
-      { id: "ice", url: "images/attack/icespike1.png" }
+      { id: "ice", url: "images/attack/icespike1.png" },
+      { id: "BG_L1", url: "images/BG_L1.png" },
+      { id: "BG_L2", url: "images/BG_L2.png" },
+      { id: "BG_L3", url: "images/BG_L3.png" },
+      { id: "BG_L4", url: "images/BG_L4.png" },
+      { id: "BG_L5", url: "images/BG_L5.png" },
+      { id: "BG_L6", url: "images/BG_L6.png" },
+      { id: "BG_L7", url: "images/BG_L7.png" },
+      { id: "smoke_death", url: "images/smoke_death.png" },
+      { id: "alien1_death", url: "images/iron_cat_death.png" },
+      { id: "alien2_death", url: "images/ice_cat_death.png" },
+      { id: "alien3_death", url: "images/ghostfire_cat_death.png" },
     ],
 
     sounds: [
@@ -105,11 +118,18 @@ if (cWIDTH > WIDTH){
     ],
 
     stars: [
-      { x: -(1052/2-WIDTH/2), y: 0, speed: { min:   0, max:   0 }, image: "bg_Mo_fair" }, // 1 in 3 get a tint of red
-      {  x: 0, y: 0, speed: { min:   16, max:  16 }, image: "bg_Mo_middle" },
-      {  x: 1052, y: 0, speed: { min:   16, max:  16 }, image: "bg_Mo_middle" },
-      {  x: 0, y: 0, speed: { min: 32, max: 32 }, image: "bg_Mo_close" },
-      {  x: 1052, y: 0, speed: { min: 32, max: 32 }, image: "bg_Mo_close" },
+      {  x: -(1052/2-WIDTH/2), y: 0, speed: { min:   0, max:   0 }, image: "BG_L1" }, // 1 in 3 get a tint of red
+      {  x: -(1052/2-WIDTH/2), y: 0, speed: { min:   0, max:   0 }, image: "BG_L2", oval: true }, // 1 in 3 get a tint of red
+      {  x: 0, y: 0, speed: { min:   128, max:  128 }, image: "BG_L3", reposition: true },
+      {  x: 0, y: 0, speed: { min:   128, max:  128 }, image: "BG_L3", reposition: true },
+      {  x: 0, y: 0, speed: { min: 16, max: 16 }, image: "BG_L4" },
+      {  x: 1052, y: 0, speed: { min: 16, max: 16 }, image: "BG_L4" },
+      {  x: 0, y: 0, speed: { min: 20, max: 20 }, image: "BG_L5" },
+      {  x: 1052, y: 0, speed: { min: 20, max: 20 }, image: "BG_L5" },
+      {  x: 0, y: 0, speed: { min: 75, max: 75 }, image: "BG_L6" },
+      {  x: 1052, y: 0, speed: { min: 75, max: 75 }, image: "BG_L6" },
+      {  x: 0, y: 0, speed: { min: 84, max: 84 }, image: "BG_L7" },
+      {  x: 1052, y: 0, speed: { min: 84, max: 84 }, image: "BG_L7" },
     ],
 
     sprites: {
@@ -125,55 +145,203 @@ if (cWIDTH > WIDTH){
                                    { x: 167, y: 18, w: 32, h: 32 },
                                    { x: 134, y: 18, w: 32, h: 32 } ] },
 
-      alien1: { fps: 5, frames: [ //phantam
-                                    { x: (0*34) + 1, y: 0+1, w: 32, h: 32 },
-                                    { x: (1*34) + 1, y: 0+1, w: 32, h: 32 },
-                                    { x: (2*34) + 1, y: 0+1, w: 32, h: 32 },
-                                    { x: (3*34) + 1, y: 0+1, w: 32, h: 32 },
-                                    { x: (4*34) + 1, y: 0+1, w: 32, h: 32 },
-                                    { x: (5*34) + 1, y: 0+1, w: 32, h: 32 },
-                                    { x: (6*34) + 1, y: 0+1, w: 32, h: 32 },
-                                    { x: (7*34) + 1, y: 0+1, w: 32, h: 32 }
+      alien1: { fps: 10, frames: [ //phantam
+                                    { x: (0*101), y: 0, w: 101, h: 101 },
+                                    { x: (1*101), y: 0, w: 101, h: 101 },
+                                    { x: (2*101), y: 0, w: 101, h: 101 },
+                                    { x: (3*101), y: 0, w: 101, h: 101 },
+                                    { x: (4*101), y: 0, w: 101, h: 101 },
+                                    { x: (5*101), y: 0, w: 101, h: 101 },
+                                    { x: (6*101), y: 0, w: 101, h: 101 },
+                                    { x: (7*101), y: 0, w: 101, h: 101 },
+                                    { x: (8*101), y: 0, w: 101, h: 101 },
+                                    { x: (9*101), y: 0, w: 101, h: 101 },
+                                    { x: (10*101), y: 0, w: 101, h: 101 },
+                                    { x: (11*101), y: 0, w: 101, h: 101 },
+                                    { x: (12*101), y: 0, w: 101, h: 101 },
+                                    { x: (13*101), y: 0, w: 101, h: 101 },
+                                    { x: (14*101), y: 0, w: 101, h: 101 },
+                                    { x: (15*101), y: 0, w: 101, h: 101 },
+                                    { x: (16*101), y: 0, w: 101, h: 101 },
+                                    { x: (17*101), y: 0, w: 101, h: 101 },
+                                    { x: (18*101), y: 0, w: 101, h: 101 },
+                                    { x: (19*101), y: 0, w: 101, h: 101 },
+                                    { x: (20*101), y: 0, w: 101, h: 101 },
+                                    { x: (21*101), y: 0, w: 101, h: 101 },
+                                    { x: (22*101), y: 0, w: 101, h: 101 },
+                                    { x: (23*101), y: 0, w: 101, h: 101 },
+                                    { x: (24*101), y: 0, w: 101, h: 101 },
+                                    { x: (25*101), y: 0, w: 101, h: 101 },
+                                    { x: (26*101), y: 0, w: 101, h: 101 },
+                                    { x: (27*101), y: 0, w: 101, h: 101 },
+                                    { x: (28*101), y: 0, w: 101, h: 101 },
+                                    { x: (29*101), y: 0, w: 101, h: 101 },
                                   ] },
 
-      alien2: { fps: 5, frames: [ //pumpkin
-                                    { x: (0*34) + 1, y: 64+1, w: 32, h: 32 },
-                                    { x: (1*34) + 1, y: 64+1, w: 32, h: 32 },
-                                    { x: (2*34) + 1, y: 64+1, w: 32, h: 32 },
-                                    { x: (3*34) + 1, y: 64+1, w: 32, h: 32 },
-                                    { x: (4*34) + 1, y: 64+1, w: 32, h: 32 },
-                                    { x: (5*34) + 1, y: 64+1, w: 32, h: 32 },
-                                    { x: (6*34) + 1, y: 64+1, w: 32, h: 32 },
-                                    { x: (7*34) + 1, y: 64+1, w: 32, h: 32 }
+      alien2: { fps: 10, frames: [ //pumpkin
+          { x: (0*101), y: 0, w: 101, h: 101 },
+          { x: (1*101), y: 0, w: 101, h: 101 },
+          { x: (2*101), y: 0, w: 101, h: 101 },
+          { x: (3*101), y: 0, w: 101, h: 101 },
+          { x: (4*101), y: 0, w: 101, h: 101 },
+          { x: (5*101), y: 0, w: 101, h: 101 },
+          { x: (6*101), y: 0, w: 101, h: 101 },
+          { x: (7*101), y: 0, w: 101, h: 101 },
+          { x: (8*101), y: 0, w: 101, h: 101 },
+          { x: (9*101), y: 0, w: 101, h: 101 },
+          { x: (10*101), y: 0, w: 101, h: 101 },
+          { x: (11*101), y: 0, w: 101, h: 101 },
+          { x: (12*101), y: 0, w: 101, h: 101 },
+          { x: (13*101), y: 0, w: 101, h: 101 },
+          { x: (14*101), y: 0, w: 101, h: 101 },
+          { x: (15*101), y: 0, w: 101, h: 101 },
+          { x: (16*101), y: 0, w: 101, h: 101 },
+          { x: (17*101), y: 0, w: 101, h: 101 },
+          { x: (18*101), y: 0, w: 101, h: 101 },
+          { x: (19*101), y: 0, w: 101, h: 101 },
+          { x: (20*101), y: 0, w: 101, h: 101 },
+          { x: (21*101), y: 0, w: 101, h: 101 },
+          { x: (22*101), y: 0, w: 101, h: 101 },
+          { x: (23*101), y: 0, w: 101, h: 101 },
+          { x: (24*101), y: 0, w: 101, h: 101 },
+          { x: (25*101), y: 0, w: 101, h: 101 },
+          { x: (26*101), y: 0, w: 101, h: 101 },
+          { x: (27*101), y: 0, w: 101, h: 101 },
                                   ] },
 
-      alien3: { fps: 5, frames: [ //ghost fire
-                                   { x: (0*34) + 1, y: 32+1, w: 32, h: 32 },
-                                   { x: (1*34) + 1, y: 32+1, w: 32, h: 32 },
-                                   { x: (2*34) + 1, y: 32+1, w: 32, h: 32 },
-                                   { x: (3*34) + 1, y: 32+1, w: 32, h: 32 },
-                                   { x: (4*34) + 1, y: 32+1, w: 32, h: 32 },
-                                   { x: (5*34) + 1, y: 32+1, w: 32, h: 32 },
-                                   { x: (6*34) + 1, y: 32+1, w: 32, h: 32 },
-                                   { x: (7*34) + 1, y: 32+1, w: 32, h: 32 }
+      alien3: { fps: 10, frames: [ //ghost fire
+          { x: (0*101), y: 0, w: 101, h: 101 },
+          { x: (1*101), y: 0, w: 101, h: 101 },
+          { x: (2*101), y: 0, w: 101, h: 101 },
+          { x: (3*101), y: 0, w: 101, h: 101 },
+          { x: (4*101), y: 0, w: 101, h: 101 },
+          { x: (5*101), y: 0, w: 101, h: 101 },
+          { x: (6*101), y: 0, w: 101, h: 101 },
+          { x: (7*101), y: 0, w: 101, h: 101 },
+          { x: (8*101), y: 0, w: 101, h: 101 },
+          { x: (9*101), y: 0, w: 101, h: 101 },
+          { x: (10*101), y: 0, w: 101, h: 101 },
+          { x: (11*101), y: 0, w: 101, h: 101 },
+          { x: (12*101), y: 0, w: 101, h: 101 },
+          { x: (13*101), y: 0, w: 101, h: 101 },
+          { x: (14*101), y: 0, w: 101, h: 101 },
+          { x: (15*101), y: 0, w: 101, h: 101 },
+          { x: (16*101), y: 0, w: 101, h: 101 },
+          { x: (17*101), y: 0, w: 101, h: 101 },
+          { x: (18*101), y: 0, w: 101, h: 101 },
+          { x: (19*101), y: 0, w: 101, h: 101 },
+          { x: (20*101), y: 0, w: 101, h: 101 },
+          { x: (21*101), y: 0, w: 101, h: 101 },
+          { x: (22*101), y: 0, w: 101, h: 101 },
+          { x: (23*101), y: 0, w: 101, h: 101 },
+          { x: (24*101), y: 0, w: 101, h: 101 },
+          { x: (25*101), y: 0, w: 101, h: 101 },
+          { x: (26*101), y: 0, w: 101, h: 101 },
+          { x: (27*101), y: 0, w: 101, h: 101 },
+          { x: (28*101), y: 0, w: 101, h: 101 },
+          { x: (29*101), y: 0, w: 101, h: 101 },
+          { x: (30*101), y: 0, w: 101, h: 101 },
+          { x: (31*101), y: 0, w: 101, h: 101 },
+          { x: (32*101), y: 0, w: 101, h: 101 },
                                   ] },
 
-      explosion: { fps: 15, frames: [
-        { x: 247, y: 302, w: 18, h: 18 },
-        { x: 217, y: 296, w: 28, h: 28 },
-        { x: 182, y: 294, w: 32, h: 32 },
-        { x: 146, y: 294, w: 32, h: 32 },
-        { x: 109, y: 294, w: 32, h: 32 },
-        { x:  72, y: 294, w: 32, h: 32 }
+      smoke_death: { fps: 10, frames: [
+        { x: 0*101, y: 0, w: 101, h: 101 },
+        { x: 1*101, y: 0, w: 101, h: 101 },
+        { x: 2*101, y: 0, w: 101, h: 101 },
+        { x: 3*101, y: 0, w: 101, h: 101 },
+        { x: 4*101, y: 0, w: 101, h: 101 },
+        { x: 5*101, y: 0, w: 101, h: 101 },
+        { x: 6*101, y: 0, w: 101, h: 101 },
+        { x: 7*101, y: 0, w: 101, h: 101 },
+        { x: 8*101, y: 0, w: 101, h: 101 },
+        { x: 9*101, y: 0, w: 101, h: 101 },
+        { x: 10*101, y: 0, w: 101, h: 101 },
+        { x: 11*101, y: 0, w: 101, h: 101 },
+        { x: 12*101, y: 0, w: 101, h: 101 },
+        { x: 13*101, y: 0, w: 101, h: 101 },
+        { x: 14*101, y: 0, w: 101, h: 101 },
       ]},
 
-      bullet1: { fps: 10, frames: [
-        { x: (0), y: 0, w: 50, h: 50 },
-        { x: (0), y: 0, w: 50, h: 50 },
-        { x: (0), y: 0, w: 50, h: 50 },
-        { x: (0), y: 0, w: 50, h: 50 },
-        { x: (0), y: 0, w: 50, h: 50 },
-        { x: (0), y: 0, w: 50, h: 50 }
+      alien3_death: { fps: 10, frames: [
+        { x: 0*101, y: 0, w: 101, h: 101 },
+        { x: 1*101, y: 0, w: 101, h: 101 },
+        { x: 2*101, y: 0, w: 101, h: 101 },
+        { x: 3*101, y: 0, w: 101, h: 101 },
+        { x: 4*101, y: 0, w: 101, h: 101 },
+        { x: 5*101, y: 0, w: 101, h: 101 },
+        { x: 6*101, y: 0, w: 101, h: 101 },
+        { x: 7*101, y: 0, w: 101, h: 101 },
+        { x: 8*101, y: 0, w: 101, h: 101 },
+        { x: 9*101, y: 0, w: 101, h: 101 },
+        { x: 10*101, y: 0, w: 101, h: 101 },
+        { x: 11*101, y: 0, w: 101, h: 101 },
+        { x: 12*101, y: 0, w: 101, h: 101 },
+        { x: 13*101, y: 0, w: 101, h: 101 },
+        { x: 14*101, y: 0, w: 101, h: 101 },
+      ]},
+
+      alien2_death: { fps: 10, frames: [
+        { x: 0*101, y: 0, w: 101, h: 101 },
+        { x: 1*101, y: 0, w: 101, h: 101 },
+        { x: 2*101, y: 0, w: 101, h: 101 },
+        { x: 3*101, y: 0, w: 101, h: 101 },
+        { x: 4*101, y: 0, w: 101, h: 101 },
+        { x: 5*101, y: 0, w: 101, h: 101 },
+        { x: 6*101, y: 0, w: 101, h: 101 },
+        { x: 7*101, y: 0, w: 101, h: 101 },
+        { x: 8*101, y: 0, w: 101, h: 101 },
+        { x: 9*101, y: 0, w: 101, h: 101 },
+        { x: 10*101, y: 0, w: 101, h: 101 },
+        { x: 11*101, y: 0, w: 101, h: 101 },
+        { x: 12*101, y: 0, w: 101, h: 101 },
+        { x: 13*101, y: 0, w: 101, h: 101 },
+        { x: 14*101, y: 0, w: 101, h: 101 },
+      ]},
+
+      alien1_death: { fps: 10, frames: [
+        { x: 0*101, y: 0, w: 101, h: 101 },
+        { x: 1*101, y: 0, w: 101, h: 101 },
+        { x: 2*101, y: 0, w: 101, h: 101 },
+        { x: 3*101, y: 0, w: 101, h: 101 },
+        { x: 4*101, y: 0, w: 101, h: 101 },
+        { x: 5*101, y: 0, w: 101, h: 101 },
+        { x: 6*101, y: 0, w: 101, h: 101 },
+        { x: 7*101, y: 0, w: 101, h: 101 },
+        { x: 8*101, y: 0, w: 101, h: 101 },
+        { x: 9*101, y: 0, w: 101, h: 101 },
+        { x: 10*101, y: 0, w: 101, h: 101 },
+        { x: 11*101, y: 0, w: 101, h: 101 },
+        { x: 12*101, y: 0, w: 101, h: 101 },
+        { x: 13*101, y: 0, w: 101, h: 101 },
+        { x: 14*101, y: 0, w: 101, h: 101 },
+      ]},
+
+      ice: { fps: 10, frames: [
+        { x: (0*50), y: 0, w: 50, h: 50 },
+        { x: (1*50), y: 0, w: 50, h: 50 },
+        { x: (2*50), y: 0, w: 50, h: 50 },
+        { x: (3*50), y: 0, w: 50, h: 50 },
+        { x: (4*50), y: 0, w: 50, h: 50 },
+        { x: (5*50), y: 0, w: 50, h: 50 },
+      ]},
+
+      fire: { fps: 10, frames: [
+        { x: (0*50), y: 0, w: 50, h: 50 },
+        { x: (1*50), y: 0, w: 50, h: 50 },
+        { x: (2*50), y: 0, w: 50, h: 50 },
+        { x: (3*50), y: 0, w: 50, h: 50 },
+        { x: (4*50), y: 0, w: 50, h: 50 },
+        { x: (4*50), y: 0, w: 50, h: 50 },
+      ]},
+
+      energy_ball: { fps: 10, frames: [
+        { x: (0*50), y: 0, w: 50, h: 50 },
+        { x: (1*50), y: 0, w: 50, h: 50 },
+        { x: (2*50), y: 0, w: 50, h: 50 },
+        { x: (3*50), y: 0, w: 50, h: 50 },
+        { x: (4*50), y: 0, w: 50, h: 50 },
+        { x: (5*50), y: 0, w: 50, h: 50 },
       ]},
 
       bullet2: { fps: 10, frames: [
@@ -409,7 +577,7 @@ if (cWIDTH > WIDTH){
         if (!alien.dead) {
           if (!player.godMode && !player.dead && Game.Math.overlap(player.x + HITBOX, player.y + HITBOX, player.w - 2*HITBOX, player.h - 2*HITBOX,
                                                 alien.x  + HITBOX, alien.y  + HITBOX, alien.w  - 2*HITBOX, alien.h  - 2*HITBOX)) {
-            effects.explode(10, player.x + player.w/2, player.y + player.h/2, player.dx, player.dy);
+            effects.explode(5, player.x + player.w/2, player.y + player.h/2, player.dx, player.dy, cfg.sprites.smoke_death, "smoke_death");
             player.die();
             aliens.die(alien);
             sounds.explode();
@@ -418,7 +586,7 @@ if (cWIDTH > WIDTH){
             bullet = bullets.pool.store[b];
             if ( alien.acceptAttack.indexOf(bullet.attack) !== -1 && bullet.player && Game.Math.overlap(bullet.x, bullet.y, bullet.size, bullet.size,
                                                    alien.x,  alien.y,  alien.w,  alien.h)) {
-              effects.explode(1, alien.x + alien.w/2, alien.y + alien.h/2, alien.dx, alien.dy);
+              effects.explode(1, alien.x + alien.w/2, alien.y + alien.h/2, alien.dx, alien.dy, cfg.sprites[alien.type + "_death"], alien.type + "_death");
               aliens.die(alien);
               bullets.die(bullet);
               sounds.explode();
@@ -435,7 +603,7 @@ if (cWIDTH > WIDTH){
         bullet = bullets.pool.store[b];
         if (!player.godMode && !bullet.player && !player.dead && Game.Math.overlap(bullet.x, bullet.y, bullet.size, bullet.size,
                                                                 player.x + HITBOX, player.y + HITBOX, player.w - 2*HITBOX, player.h - 2*HITBOX)) {
-          effects.explode(10, player.x + player.w/2, player.y + player.h/2, player.dx, player.dy);
+          effects.explode(10, player.x + player.w/2, player.y + player.h/2, player.dx, player.dy, cfg.sprites.smoke_death, "smoke_death");
           player.die();
           bullets.die(bullet);
           sounds.explode();
@@ -447,7 +615,7 @@ if (cWIDTH > WIDTH){
         rock = rocks.rocks[r];
         if (!player.godMode && rock.enabled && !player.dead && Game.Math.overlap(rock.x + rock.hitbox.x, rock.y + (rock.top ? 0 : rock.hitbox.y), rock.w - (2*rock.hitbox.x), rock.h - rock.hitbox.y,
                                                               player.x + HITBOX, player.y + HITBOX, player.w - 2*HITBOX, player.h - 2*HITBOX)) {
-          effects.explode(10, player.x + player.w/2, player.y + player.h/2, player.dx, player.dy);
+          effects.explode(10, player.x + player.w/2, player.y + player.h/2, player.dx, player.dy, cfg.sprites.smoke_death, "smoke_death");
           player.die();
           sounds.explode();
         }
@@ -544,7 +712,7 @@ if (cWIDTH > WIDTH){
         if(this.y >= this.maxy){
           // this.y = this.maxy;
           this.die();
-          effects.explode(5, player.x + player.w/2, player.y + player.h/2, 10, 10);
+          effects.explode(1, player.x + player.w/2, player.y + player.h/2, 10, 10, cfg.sprites.smoke_death, "smoke_death");
           sounds.explode();
             this.x = player.X;
             this.y = player.Y;
@@ -602,13 +770,13 @@ if (cWIDTH > WIDTH){
   var Bullet = Class.create({
 
     initialize: function(entity, x, y) {
-      this.player = (entity == player);
+      this.player = (entity === player);
       this.x      = x;
       this.y      = y;
-      this.size   = this.player ? 50 : Game.Math.randomInt(8, 16);
+      this.size   = this.player ? 50 : Game.Math.randomInt(16, 20);
       this.image  = this.player ? player.attack: "bullets";
       this.attack  = this.player ? player.attack: false;
-      this.sprite = this.player ? cfg.sprites.bullet1 : cfg.sprites.bullet2;
+      this.sprite = this.player ? cfg.sprites[player.attack] : cfg.sprites.bullet2;
       this.speed  = this.player ? PLAYER.BULLET_SPEED : (x > player.x ? -1 : -1) * Game.Math.random(ALIEN.BULLET_SPEED.MIN, ALIEN.BULLET_SPEED.MAX);
       Game.animate(this);
     }
@@ -754,6 +922,7 @@ if (cWIDTH > WIDTH){
           score:   100,
           escaped: false,
           acceptAttack: wave.acceptAttack,
+          type: "alien" + wave.alien
         };
         Game.animate(alien);
         this.aliens.push(alien);
@@ -765,7 +934,7 @@ if (cWIDTH > WIDTH){
         jq("#cn-wrapper .waveProgress." + this.attacks[ak].attack).css('transform', 'rotate(' + this.attacks[ak].deg + 'deg) skew(30deg) scale(0)');
       }
 
-      jq("#cn-wrapper .attackBtn a").css('background-color', 'hsla(0, 88%, 63%, 0.5)');
+      jq("#cn-wrapper .attackBtn a").css('background-color', 'hsla(107,83%,66%, 0.5)');
       jq("#cn-wrapper .attackBtn img").css('opacity', 0.25);
       jq("#cn-wrapper .attackBtn." + wave.acceptAttack + ' img').css('opacity', 1);
     },
@@ -885,11 +1054,11 @@ if (cWIDTH > WIDTH){
               var background = 'hsla(0, 0%, 100%, 0.5)';
             } else {
               var alpha = 1;
-              var background = 'hsla(0, 88%, 63%, 0.5)';
+              var background = 'hsla(107,83%,66%,0.5)';
             }
           } else if (this.moveframe >= wave.totalMove) {
             var alpha = 1;
-            var background = 'hsla(0, 88%, 63%, 0.5)';
+            var background = 'hsla(107,83%,66%,0.5)';
           }
           jq("#cn-wrapper .attackBtn." + nextAcceptAttack + ' img').css('opacity', alpha);
           jq("#cn-wrapper .attackBtn." + nextAcceptAttack + ' a').css('background-color', background);
@@ -910,12 +1079,12 @@ if (cWIDTH > WIDTH){
         if (endOfWave) {
 
           var alpha = 1;
-          var background = 'hsla(0, 88%, 63%, 0.5)';
+          var background = 'hsla(107,83%,66%,0.5)';
           var nextIndex = this.index < this.waves.length - 1 ? this.index + 1 : 0;
           var nextAcceptAttack = this.waves[nextIndex].acceptAttack[0];
           jq("#cn-wrapper .attackBtn img").css('opacity', 0.25);
           jq("#cn-wrapper .attackBtn." + nextAcceptAttack + ' img').css('opacity', alpha);
-          jq("#cn-wrapper .attackBtn a").css('background-color', 'hsla(0, 88%, 63%, 0.5)');
+          jq("#cn-wrapper .attackBtn a").css('background-color', 'hsla(107,83%,66%,0.5)');
 
             aliens.firstAlienMove = false;
             aliens.moveframe = 0;
@@ -945,7 +1114,7 @@ if (cWIDTH > WIDTH){
   //===============================================================================================
 
   var Fx = Class.create({
-    initialize: function(x, y, w, h, dx, dy, defer, sprite) {
+    initialize: function(x, y, w, h, dx, dy, defer, sprite, image) {
       this.x      = x;
       this.y      = y;
       this.w      = w;
@@ -954,6 +1123,7 @@ if (cWIDTH > WIDTH){
       this.dy     = dy;
       this.defer  = defer;
       this.sprite = sprite;
+      this.image  = image;
     }
   });
 
@@ -967,14 +1137,14 @@ if (cWIDTH > WIDTH){
       });
     },
 
-    explode: function(count, x, y, dx, dy) {
+    explode: function(count, x, y, dx, dy, sprite, image) {
       var n, variety, nx, ny, defer, fx;
       for(n = 0 ; n < count ; n++) {
         variety = n*5;
         nx      = Game.Math.random(-variety, variety);
         ny      = Game.Math.random(-variety, variety);
         defer   = Game.Math.randomInt(0, variety);
-        fx = this.pool.allocate(x + nx, y + ny, 64, 64, dx, dy, defer, cfg.sprites.explosion);
+        fx = this.pool.allocate(x + nx, y + ny, 64, 64, dx, dy, defer, sprite, image);
         Game.animate(fx);
       }
     },
@@ -1034,7 +1204,9 @@ if (cWIDTH > WIDTH){
           // size:  1024,
           x:     layer.x,
           y:     layer.y,
-          image: layer.image
+          image: layer.image,
+          reposition: layer.reposition,
+          oval: layer.oval,
         });
       }
       return stars;
@@ -1054,14 +1226,31 @@ if (cWIDTH > WIDTH){
         star = this.stars[n];
         star.x = star.x - (star.speed * dt);
 
-        if (star.x <= -1052){
-          this.repositionStar(star);
+        if(star.oval){
+            if(!star.ovalx){
+                star.ovalx = 0;
+            }
+            if(!star.ovaly){
+                star.ovaly = 0;
+            }
+            star.ovalx = star.ovalx + 0.005;
+            star.ovaly = star.ovaly + 0.005;
+            star.x = Math.sin(star.ovalx)*10 + -(1052/2-WIDTH/2)
+            star.y = Math.cos(star.ovaly)*38
+            console.log(star.x)
+            console.log(star.y)
+        }
+        if (star.x <= -1052 && star.reposition){
+          this.repositionStar(star, 5260 - (star.speed * dt));
+        }else if (star.x < -1052){
+          var dx2 = star.x - -1052
+          this.repositionStar(star, 1052 + dx2);
         }
       }
     },
 
-    repositionStar: function(star) {
-      star.x = 1052;
+    repositionStar: function(star, x) {
+      star.x = x;
       // star.y = HEIGHT;
     }
 
@@ -1150,7 +1339,7 @@ if (cWIDTH > WIDTH){
         if (!alien.pending && !alien.escaped && !alien.dead) {
           sprite = alien.sprite;
           frame  = sprite.frames[alien.anim.frame];
-          this.ctx.drawImage(this.images.aliens, frame.x, frame.y, frame.w, frame.h,
+          this.ctx.drawImage(this.images[alien.type], frame.x, frame.y, frame.w, frame.h,
                                                  alien.x + (dt * alien.dx), alien.y + (dt * alien.dy), alien.w, alien.h);
         }
       }
@@ -1176,6 +1365,7 @@ if (cWIDTH > WIDTH){
         bullet = bullets.pool.store[n];
         sprite = bullet.sprite;
         frame  = sprite.frames[bullet.anim.frame];
+
         this.ctx.drawImage(this.images[bullet.image], frame.x,  frame.y,  frame.w,     frame.h,
                                                 bullet.x + (dt * bullet.speed), bullet.y, bullet.size, bullet.size);
       }
@@ -1188,7 +1378,8 @@ if (cWIDTH > WIDTH){
         if (!fx.defer) {
           sprite = fx.sprite;
           frame  = sprite.frames[fx.anim.frame];
-          this.ctx.drawImage(this.images.sprites, frame.x, frame.y, frame.w, frame.h,
+          // console.log(fx)
+          this.ctx.drawImage(this.images[fx.image], frame.x, frame.y, frame.w, frame.h,
                                                   fx.x - fx.w/2, fx.y - fx.h/2, fx.w, fx.h);
         }
       }
@@ -1289,9 +1480,9 @@ if (cWIDTH > WIDTH){
 
     size: function(options) {
       switch(options.alien) {
-        case 1: return 1;
-        case 2: return 1.5;
-        case 3: return 1.5;
+        case 1: return 1.75;
+        case 2: return 1.75;
+        case 3: return 1.75;
         default:
           throw 'unknown alien';
       }
