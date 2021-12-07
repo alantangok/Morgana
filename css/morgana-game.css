@@ -131,6 +131,23 @@ body,body.modal-open {
     word-wrap: break-word;
 }
 
+#start {
+    margin: 0px;
+    font-weight: bold;
+    color: white;
+    display: block;
+    width: 100%;
+    text-align: center;
+    vertical-align: center;
+    z-index: 1;
+    position: absolute;
+    top: 60vh;
+}
+
+#start h2 {
+    top: 5vh;
+    font-size: 1.5em;
+}
 
 
 

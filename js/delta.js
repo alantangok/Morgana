@@ -1,4 +1,4 @@
-var Delta = function(morganaId) {
+var Delta = function() {
 
     'use strict';
 
@@ -43,7 +43,8 @@ if (cWIDTH > WIDTH){
       ALIEN    = {                W: 32,  H: 32, BULLET_SPEED: { MIN: 400, MAX: 600 } },
       ROCK     = {                W: 256, H: 128, DX: -375 },
       playerBullets   = ['fire', 'ice', 'energy_ball'],
-      playerCanvas, playerCtx
+      playerCanvas, playerCtx,
+      allResources, killEnemy = 0, playtime = 0, wavesPassed = 0, playerDie = 0, playerJump = 0, isIos = false;
 
 
       document.getElementById("delta").style.width = WIDTH + "px";
@@ -70,7 +71,7 @@ if (cWIDTH > WIDTH){
       { id: "rocks",   url: "images/rocks.png"   },
       { id: "bullets", url: "images/bullets.png" },
       { id: "player", url: "images/bullets.png" },
-      { id: "player1", url: "images/morgana/" + morganaId + ".png" },
+      { id: "player1", url: "images/morgana/" + window.morganaId + ".png" },
       { id: "bg_Mo_fair", url: "images/bg_Mo_fair.png" },
       { id: "bg_Mo_middle", url: "images/bg_Mo_middle.png" },
       { id: "bg_Mo_close", url: "images/bg_Mo_close.png" },
@@ -353,40 +354,40 @@ if (cWIDTH > WIDTH){
         { x: (5 * 14), y: 14 + 1, w: 14, h: 12 }
       ]},
 
-      rock: { fps: 10, frames: [
-              { x: (0 * 65), y: 1, w: 65, h: 32 },
-              { x: (0 * 65), y: 1, w: 65, h: 32 },
-              { x: (0 * 65), y: 1, w: 65, h: 32 },
-              { x: (0 * 65), y: 1, w: 65, h: 32 },
-              { x: (0 * 65), y: 1, w: 65, h: 32 },
-              { x: (0 * 65), y: 1, w: 65, h: 32 },
-              { x: (0 * 65), y: 1, w: 65, h: 32 },
-              { x: (0 * 65), y: 1, w: 65, h: 32 },
-              { x: (0 * 65), y: 1, w: 65, h: 32 },
-              { x: (0 * 65), y: 1, w: 65, h: 32 },
-              { x: (1 * 65), y: 1, w: 65, h: 32 },
-              { x: (1 * 65), y: 1, w: 65, h: 32 },
-              { x: (2 * 65), y: 1, w: 65, h: 32 },
-              { x: (2 * 65), y: 1, w: 65, h: 32 },
-              { x: (3 * 65), y: 1, w: 65, h: 32 },
-              { x: (3 * 65), y: 1, w: 65, h: 32 },
-              { x: (3 * 65), y: 1, w: 65, h: 32 },
-              { x: (3 * 65), y: 1, w: 65, h: 32 },
-              { x: (3 * 65), y: 1, w: 65, h: 32 },
-              { x: (2 * 65), y: 1, w: 65, h: 32 },
-              { x: (2 * 65), y: 1, w: 65, h: 32 },
-              { x: (1 * 65), y: 1, w: 65, h: 32 },
-              { x: (1 * 65), y: 1, w: 65, h: 32 },
-              { x: (0 * 65), y: 1, w: 65, h: 32 },
-              { x: (0 * 65), y: 1, w: 65, h: 32 },
-              { x: (0 * 65), y: 1, w: 65, h: 32 },
-              { x: (0 * 65), y: 1, w: 65, h: 32 },
-              { x: (0 * 65), y: 1, w: 65, h: 32 },
-              { x: (0 * 65), y: 1, w: 65, h: 32 },
-              { x: (0 * 65), y: 1, w: 65, h: 32 },
-              { x: (0 * 65), y: 1, w: 65, h: 32 },
-              { x: (0 * 65), y: 1, w: 65, h: 32 },
-              { x: (0 * 65), y: 1, w: 65, h: 32 },
+      rock: { fps: 15, frames: [
+              { x: (0 * 128), y: 0, w: 128, h: 64 },
+              { x: (0 * 128), y: 0, w: 128, h: 64 },
+              { x: (0 * 128), y: 0, w: 128, h: 64 },
+              { x: (0 * 128), y: 0, w: 128, h: 64 },
+              { x: (0 * 128), y: 0, w: 128, h: 64 },
+              { x: (0 * 128), y: 0, w: 128, h: 64 },
+              { x: (0 * 128), y: 0, w: 128, h: 64 },
+              { x: (0 * 128), y: 0, w: 128, h: 64 },
+              { x: (0 * 128), y: 0, w: 128, h: 64 },
+              { x: (0 * 128), y: 0, w: 128, h: 64 },
+              { x: (1 * 128), y: 0, w: 128, h: 64 },
+              { x: (1 * 128), y: 0, w: 128, h: 64 },
+              { x: (2 * 128), y: 0, w: 128, h: 64 },
+              { x: (2 * 128), y: 0, w: 128, h: 64 },
+              { x: (3 * 128), y: 0, w: 128, h: 64 },
+              { x: (3 * 128), y: 0, w: 128, h: 64 },
+              { x: (3 * 128), y: 0, w: 128, h: 64 },
+              { x: (3 * 128), y: 0, w: 128, h: 64 },
+              { x: (3 * 128), y: 0, w: 128, h: 64 },
+              { x: (2 * 128), y: 0, w: 128, h: 64 },
+              { x: (2 * 128), y: 0, w: 128, h: 64 },
+              { x: (1 * 128), y: 0, w: 128, h: 64 },
+              { x: (1 * 128), y: 0, w: 128, h: 64 },
+              { x: (0 * 128), y: 0, w: 128, h: 64 },
+              { x: (0 * 128), y: 0, w: 128, h: 64 },
+              { x: (0 * 128), y: 0, w: 128, h: 64 },
+              { x: (0 * 128), y: 0, w: 128, h: 64 },
+              { x: (0 * 128), y: 0, w: 128, h: 64 },
+              { x: (0 * 128), y: 0, w: 128, h: 64 },
+              { x: (0 * 128), y: 0, w: 128, h: 64 },
+              { x: (0 * 128), y: 0, w: 128, h: 64 },
+              { x: (0 * 128), y: 0, w: 128, h: 64 },
+              { x: (0 * 128), y: 0, w: 128, h: 64 },
       ]}
 
     }
@@ -480,6 +481,20 @@ if (cWIDTH > WIDTH){
       jq(event.target).parent('a').click();
     });
 
+    jq('.cards_item a').on('click', function (event) {
+      allResources.images['player1'] = $({ tag: 'img' });
+      allResources.images['player1'].on('load', onload);
+      allResources.images['player1'].src = 'images/morgana/' + morganaId + '.png';
+      renderer.reset(allResources.images);
+    });
+
+    jq('.changeMorgana').on('click', function (event) {
+    });
+
+    if(iOS()){
+      isIos = true;
+    }
+
   }
 
   //===============================================================================================
@@ -502,9 +517,11 @@ if (cWIDTH > WIDTH){
 
     onboot: function() {
       Game.Load.resources(cfg.images, cfg.sounds, function(resources) {
+        allResources = resources;
         renderer.reset(resources.images);
         sounds.reset(resources.sounds);
         engine.booted();
+        console.log('ssss');
       });
     },
 
@@ -548,6 +565,7 @@ if (cWIDTH > WIDTH){
         rocks.update(dt);
         effects.update(dt);
         this.detectCollisions();
+        playtime++;
       }else if (this.isTitle()){
           stars.update(dt);
       }
@@ -593,6 +611,7 @@ if (cWIDTH > WIDTH){
               b--;
               maxBullets--;
               player.increaseScore(alien.score);
+              killEnemy++;
             }
           }
         }
@@ -700,6 +719,7 @@ if (cWIDTH > WIDTH){
           this.jumpCOOLDOWN = jumpCOOLDOWN;
           this.movingUp = false;
           this.anim.frame = 0;
+            playerJump++;
         }else{
           this.dy += GRAVITY;
         }
@@ -746,6 +766,7 @@ if (cWIDTH > WIDTH){
             this.setLives(this.lives-1);
             this.anim.frame = 0;
             this.reviveCooldown = reviveCooldown;
+            playerDie++;
             if (!this.lives){
                 updateScore(this.score, 'getScore');
                 setTimeout(engine.quit.bind(engine), 4000);
@@ -888,6 +909,7 @@ if (cWIDTH > WIDTH){
     },
 
     startWave: function(index) {
+        wavesPassed++;
       this.index  = index;
       this.frame  = 0;
       this.aliens = [];
@@ -1237,8 +1259,8 @@ if (cWIDTH > WIDTH){
             star.ovaly = star.ovaly + 0.005;
             star.x = Math.sin(star.ovalx)*10 + -(1052/2-WIDTH/2)
             star.y = Math.cos(star.ovaly)*38
-            console.log(star.x)
-            console.log(star.y)
+            // console.log(star.x)
+            // console.log(star.y)
         }
         if (star.x <= -1052 && star.reposition){
           this.repositionStar(star, 5260 - (star.speed * dt));
@@ -1352,7 +1374,7 @@ if (cWIDTH > WIDTH){
         if (rock.enabled) {
           sprite = rocks.sprite;
           frame  = sprite.frames[rocks.anim.frame];
-          this.ctx.drawImage(this.images.rocks, frame.x, rock.top? frame.y: frame.y + 32, frame.w, frame.h,
+          this.ctx.drawImage(this.images.rocks, frame.x, rock.top? frame.y: frame.y + 64, frame.w, frame.h,
                                                 rock.x + (dt * rock.dx), rock.y, rock.w, rock.h);
 
         }
@@ -1425,8 +1447,8 @@ if (cWIDTH > WIDTH){
     playTitleMusic: function() { this.stopAllMusic(); this.play(this.sounds.title); },
     playGameMusic:  function() { this.stopAllMusic(); this.play(this.sounds.game);  },
     stopAllMusic:   function() { this.sounds.title.stop(); this.sounds.game.stop(); },
-    explode:        function() { this.play(this.sounds.explode);                    },
-    shoot:          function() { this.play(this.sounds.shoot);                      }
+    explode:        function() { isIos === false ? this.play(this.sounds.explode) : false ;                    },
+    shoot:          function() { isIos === false ? this.play(this.sounds.shoot) : false ;                      }
 
   });
 
@@ -1791,6 +1813,46 @@ if (cWIDTH > WIDTH){
     run();
 
     // return run;
+
+    function updateScore(score, callback) {
+        jq.ajax({
+            method: "POST",
+            url: "api/updateScore.php",
+            data: {
+                score: score,
+                walletAddress: wallAddress,
+                playtime: playtime,
+                killEnemy: killEnemy,
+                wavesPassed: wavesPassed,
+                playerDie: playerDie,
+                playerJump: playerJump
+            }
+        }).done(function (data) {
+                console.log(data);
+                getScore();
+
+                killEnemy = 0;
+                playtime = 0;
+                wavesPassed = 0;
+                playerDie = 0;
+                playerJump = 0;
+            });
+
+    }
+
+    function iOS() {
+      return [
+          'iPad Simulator',
+          'iPhone Simulator',
+          'iPod Simulator',
+          'iPad',
+          'iPhone',
+          'iPod'
+        ].includes(navigator.platform)
+        // iPad on iOS 13 detection
+        || (navigator.userAgent.includes("Mac") && "ontouchend" in document)
+    }
+
   //-----------------------------------------------------------------------------------------------
 
 };

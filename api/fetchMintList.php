@@ -14,7 +14,8 @@ if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
     shell_exec("metaboss -r https://api.mainnet-beta.solana.com snapshot mints --update-authority $updateAuthority");
 } else {
     // run 'visudo'
-    // add line at the end 'www-data ALL=NOPASSWD: /var/www/html/mint/bin/metaboss'
+    // add line at the end of the file: 'www-data ALL=NOPASSWD: /var/www/html/mint/bin/metaboss'
+    // this is for password less root user
     exec("sudo ./metaboss -r https://api.mainnet-beta.solana.com snapshot mints --update-authority $updateAuthority --output $metabossPath 2>&1");
 }
 $mintList = json_decode(file_get_contents("./{$updateAuthority}_mint_accounts.json", True));

@@ -3,6 +3,7 @@ ini_set('memory_limit', '1024M');
 
 // database
 require './config/config.php';
+//require "./lib/composer_components/autoload.php";
 
 unset($data);
 
@@ -17,9 +18,12 @@ if($walletAddress === 'guest'){
 
 $sqlQuery = sqlUpdateOrInsert('contest_record', [
     'walletAddress' => getgpc('walletAddress'),
-    'gamingDuration' => intval(getgpc('gamingDuration')),
+    'gamingDuration' => intval(getgpc('playtime')),
     'score' => intval(getgpc('score')),
-    'enemyKill' => intval(getgpc('enemyKill')),
+    'enemyKill' => intval(getgpc('killEnemy')),
+    'wavesPassed' => intval(getgpc('wavesPassed')),
+    'playerDie' => intval(getgpc('playerDie')),
+    'playerJump' => intval(getgpc('playerJump')),
     'ip' => getUserIP(),
 ]);
 
@@ -215,3 +219,35 @@ function getUserIP($returnArray = false)
     }
     return $ipList ? $ipList : null;
 }
+
+
+
+//function loadEncryptionKeyFromConfig()
+//{
+//    $keyAscii = "def0000095030d11d7621cdb0bc9bf954e902e308ac34d709b420796d42647a08d59467ff92133ca71d0b421154c619d412ed2868f6356f78baf008c380d0de66a75973b";
+//    return Defuse\Crypto\Key::loadFromAsciiSafeString($keyAscii);
+//}
+//
+//function encryptString($string)
+//{
+//    $key = loadEncryptionKeyFromConfig();
+//    $string = (string) $string;
+//    return Defuse\Crypto\Crypto::encrypt(mysql_escape($string), $key);
+//}
+//
+//function decryptString($string)
+//{
+//    $key = loadEncryptionKeyFromConfig();
+//    $string = (string) $string;
+//    try {
+//        $serect_data = Defuse\Crypto\Crypto::decrypt($string, $key);
+//    } catch (Defuse\Crypto\Exception\WrongKeyOrModifiedCiphertextException $ex) {
+//        // An attack! Either the wrong key was loaded, or the ciphertext has
+//        // changed since it was created -- either corrupted in the database or
+//        // intentionally modified by Eve trying to carry out an attack.
+//
+//        // ... handle this case in a way that's suitable to your application ...
+//    }
+//
+//    return $serect_data ? $serect_data : false;
+//}

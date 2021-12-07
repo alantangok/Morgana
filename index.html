@@ -9,12 +9,12 @@
     <link rel="manifest" href="/manifest.json"/>
     <title>Morgana Shoot em' up</title>
 
-    <link rel="stylesheet" href="css/bootstrap.min.css?v=0.613">
-    <link href="css/normalize.css?v=0.613" media="screen, print" rel="stylesheet" type="text/css"/>
-    <link href="css/delta.css?v=0.613" media="screen, print" rel="stylesheet" type="text/css"/>
+    <link rel="stylesheet" href="css/bootstrap.min.css?v=0.613GC">
+    <link href="css/normalize.css?v=0.613GC" media="screen, print" rel="stylesheet" type="text/css"/>
+    <link href="css/delta.css?v=0.613GC" media="screen, print" rel="stylesheet" type="text/css"/>
 
-    <link href="static/css/main.01e9d104.chunk.css?v=0.613" rel="stylesheet">
-    <link href="css/morgana-game.css?v=0.613" rel="stylesheet">
+    <link href="static/css/main.01e9d104.chunk.css?v=0.613GC" rel="stylesheet">
+    <link href="css/morgana-game.css?v=0.613GC" rel="stylesheet">
 </head>
 <body>
 <noscript>You need to enable JavaScript to run this app.</noscript>
@@ -34,6 +34,8 @@
                 <div id="root"></div>
                 <hr>
                 <button class="btn playAsGuest">Play as guest?</button>
+                <hr>
+                <button class="btn btn-success mintYouOwnMorgana">Mint your own Morgana !</button>
             </div>
 
             <!-- Modal footer -->
@@ -116,7 +118,11 @@
     <img id="booting" src='images/booting.gif'>
 
     <h1 id="title" style="display:none;">Morgana</h1>
-    <h2 id="start" style="display:none;">press "spacebar" or touch the screen</h2>
+    <div id="start">
+        <h2>press "spacebar" or touch the screen</h2>
+        <button class="btn btn-info changeMorgana">Change Morgana</button>
+        <button class="btn btn-info mintYouOwnMorgana">Mint Your Morgana</button>
+    </div>
     <h1 id="prepare" style="display:none;">Go fight!</h1>
 
     <canvas id="canvas">
@@ -129,17 +135,17 @@
 
 </div>
 
-<script src="js/react.js?v=0.613"></script>
-<script src="static/js/2.316cc20d.chunk.js?v=0.613"></script>
-<script src="static/js/main.e06d2db9.chunk.js?v=0.613"></script>
+<script src="js/react.js?v=0.613GC"></script>
+<script src="static/js/2.316cc20d.chunk.js?v=0.613GC"></script>
+<script src="static/js/main.e06d2db9.chunk.js?v=0.613GC"></script>
 
-<script src="js/jquery-3.6.0.min.js?v=0.613"></script>
-<script src="js/bootstrap.bundle.min.js?v=0.613"></script>
-<script>var jq = $.noConflict();</script>
+<script src="js/jquery-3.6.0.min.js?v=0.613GC"></script>
+<script src="js/bootstrap.bundle.min.js?v=0.613GC"></script>
+<script>var jq = jQuery.noConflict();</script>
 
-<script src="js/vendor.js?v=0.613"></script>
-<script src="js/game.js?v=0.613"></script>
-<script src="js/delta.js?v=0.613"></script>
+<script src="js/vendor.js?v=0.613GC"></script>
+<script src="js/game.js?v=0.613GC"></script>
+<script src="js/delta.js?v=0.613GC"></script>
 
 <script>
     (function(){
@@ -185,14 +191,19 @@
     })();
 
     var walletAddress = "";
+    var nftAccounts = "";
     var appendedList = [];
     var runnging = false;
+    var imagesList = [];
+    var morganaId = 0;
     var loadingSpinner = '<div class="spinner-border" role="status">\n' +
         '  <span class="sr-only">Loading...</span>\n' +
         '</div>';
 
     function chooseCh() {
-        jq('#login .modal-body').empty().append(loadingSpinner);
+      jq('#charaterSelector .modal-body').empty().append(loadingSpinner);
+      jq('#login').modal('hide');
+      jq('#charaterSelector').modal('show');
         jq.ajax({
             method: "POST",
             url: "api/getMetadata.php",
@@ -201,42 +212,48 @@
             }
         })
             .done(function (data) {
-                jq('#login').modal('hide');
-                var imagesList = JSON.parse(data);
-                jq(imagesList).each(function (index, element) {
-                    if (appendedList.indexOf(element.id) == -1) {
-                        jq('#charaterSelector .cards').append('<li class="cards_item">\n' +
-                            '                            <a href="#" data-id="' + element.id + '">\n' +
-                            '                                <div class="card">\n' +
-                            '                                    <div class="card_image">\n' +
-                            '                                        <img src="images/morgana/' + element.id + '.png"/>\n' +
-                            '                                    </div>\n' +
-                            '\n' +
-                            '                                    <div class="card_content">\n' +
-                            '                                        <h3 class="card_title">' + element.name + '</h3>\n' +
-                            '                                    </div>\n' +
-                            '                                </div>\n' +
-                            '                            </a>\n' +
-                            '                        </li>')
-
-                    }
-                    appendedList.push(element.id);
-                    console.log(appendedList);
-                });
-
-                jq('#charaterSelector').modal('show');
-                jq('.cards_item a').on('click', function (event) {
-                    morganaId = jq(event.target).parents('a').data("id");
-                    enterGame(morganaId);
-                    jq('#charaterSelector').modal('hide');
-                });
+              selectMorgana(data)
             });
 
-        jq('.score').on('click', function (event) {
-            getScore();
-            return false;
-        });
+    }
 
+    function selectMorgana(data) {
+      if(data){
+        appendedList = [];
+        imagesList = JSON.parse(data);
+        jq('#charaterSelector .modal-body').empty().append(
+          '                <div class="main">\n' +
+          '                    <ul class="cards"></ul>\n' +
+          '                </div>'
+        );
+      }
+
+      jq(imagesList).each(function (index, element) {
+        if (appendedList.indexOf(element.id) === -1) {
+          jq('#charaterSelector .cards').append('<li class="cards_item">\n' +
+            '                            <a href="#" data-id="' + element.id + '">\n' +
+            '                                <div class="card">\n' +
+            '                                    <div class="card_image">\n' +
+            '                                        <img src="images/morgana/' + element.id + '.png"/>\n' +
+            '                                    </div>\n' +
+            '\n' +
+            '                                    <div class="card_content">\n' +
+            '                                        <h3 class="card_title">' + element.name + '</h3>\n' +
+            '                                    </div>\n' +
+            '                                </div>\n' +
+            '                            </a>\n' +
+            '                        </li>')
+          appendedList.push(element.id);
+        }
+        // console.log(appendedList);
+      });
+
+      // jq('#charaterSelector').modal('show');
+      jq('.cards_item a').on('click', function (event) {
+        morganaId = jq(event.target).parents('a').data("id");
+        enterGame();
+        jq('#charaterSelector').modal('hide');
+      });
     }
 
     function enterGame(morganaId) {
@@ -245,22 +262,6 @@
             Delta(morganaId);
             runnging = true;
         }
-    }
-
-    function updateScore(score, callback) {
-        jq.ajax({
-            method: "POST",
-            url: "api/updateScore.php",
-            data: {
-                score: score,
-                walletAddress: wallAddress
-            }
-        })
-            .done(function (data) {
-                console.log(data);
-                getScore();
-            });
-
     }
 
 
@@ -300,6 +301,24 @@
         jq('#login').modal('hide');
         enterGame(0);
         wallAddress = 'guest';
+    });
+    jq('.mintYouOwnMorgana').on('click', function (event) {
+        window.open('https://mint.morgana-nft.io/', '_blank');
+        return false;
+    });
+    jq('.changeMorgana').on('click', function (event) {
+        event.stopPropagation();
+        if(wallAddress && nftAccounts && imagesList){
+          jq('#charaterSelector').modal('show');
+          selectMorgana();
+        }else{
+          jq('#login').modal('show');
+        }
+        return false;
+    });
+    jq('.score').on('click', function (event) {
+      getScore();
+      return false;
     });
 </script>
 
