@@ -1,84 +1,115 @@
-Javascript Delta
-=================
+# Morgana - Shoot 'em Up Game
 
-This is a small weekend homage to the classic c64 shoot-em-up "Delta".
+A modern web-based shoot 'em up game featuring Morgana character with multiple weapon types and dynamic enemy patterns.
 
- * [Read more](http://codeincomplete.com/posts/2014/5/3/javascript_delta/)
+![Morgana Game](images/favicon.png)
 
-TODO
-====
+## 🎮 Game Features
 
- - POWER UPS
-   - speed
-   - fire rate
-   - fire multiple
-   - fire up/down/back
-   - shield
+- **Multiple Weapon Types**
+  - Fire Bullets
+  - Ice Bullets
+  - Energy Balls
+  - Switch weapons using number keys (1-3)
 
- - MORE ALIEN VARIETY:
-   - rotate around a queen alien
-   - pillars with gaps to fly through
-   - boss aliens
-   - split/multiple waves (e.g. 2 or more independent waves at same time)
-   - ddx/ddy accelerating (hyperbolic and elliptical motion)
-   - give aliens customizable health so they might take multiple shots before dying
-   - give aliens customizable shot rate
+- **Dynamic Enemy System**
+  - Various enemy types with unique behaviors
+  - HD enemy graphics
+  - Individual death animations
+  - Progressive difficulty system
 
- - MORE GRAPHICS
-   - alien graphics
-   - bullet graphics
-   - rock/border graphics
-   - title screen graphics
+- **Wave System**
+  - 4-wave cycle with increasing difficulty
+  - Wave 1: Slow enemies, fixed patterns
+  - Wave 2: Slow enemies, random patterns
+  - Wave 3: Fast enemies, fixed patterns
+  - Wave 4: Fast enemies, random patterns
+  - After cycle completion: Random pattern selection
 
- - CLEANUP and MISC
-   - clean up the hideous N^2 collision detection code
-   - use a little PUB/SUB event handling for simpler code
-   - "are you sure" confirmation on quit
-   - high scores
-   - performance (avoid garbage, optimize rendering)
+- **Visual Effects**
+  - HD character graphics
+  - Bullet animations
+  - Dynamic backgrounds with oval movement option
+  - Modern color scheme
 
+## 🚀 Getting Started
 
-DEVELOPMENT
-===========
+### Prerequisites
+- Web browser with JavaScript enabled
+- PHP server for API functionality
+- Composer for PHP dependencies
+- Node.js and npm for frontend dependencies
 
-The game is 100% client side javascript and css. It should run when served up by any web server.
+### Installation
 
-Any changes to the following files will be reflected immediately on refresh of the browser
+1. Clone the repository:
+```bash
+git clone https://github.com/alantangok/Morgana.git
+```
 
-  - js/delta.js
-  - css/delta.css
-  - images/
-  - levels/
+2. Install PHP dependencies:
+```bash
+composer install
+```
 
-However, if you modify the js/game/ or js/vendor/ javascript files, the unified versions need to be regenerated:
+3. Install frontend dependencies:
+```bash
+npm install
+```
 
-    js/vendor.js        # the unified 3rd party vendor scripts (fpsmeter, state-machine, etc)
-    js/game.js          # the unified general purpose game engine
+4. Configure your web server to point to the project directory
 
-If you have the Ruby language available, Rake tasks can be used to auto generate these unified files:
+5. Access the game through your web browser
 
-    rake assets:create   # re-create unified javascript/css asset files on demand
-    rake assets:server   # run a simple rack server that automatically regenerates the unified files when the underlying source is modified
+## 🎯 How to Play
 
-Attributions
-============
+1. Login or play as guest
+2. Select your character
+3. Use arrow keys or WASD to move
+4. Use number keys (1-3) to switch weapons
+5. Avoid enemies and their projectiles
+6. Defeat enemies to score points
+7. Complete waves to progress
 
-All sounds effects are CC licensed from freesound.org
+## 🛠 Technical Stack
 
- - [shoot](http://www.freesound.org/people/bubaproducer/sounds/151011/)
- - [explode](http://www.freesound.org/people/Nbs%20Dark/sounds/94185/)
+- Frontend:
+  - HTML5
+  - CSS3
+  - JavaScript
+  - React.js
+  - Bootstrap
 
-Music is (respectfully) borrowed from [Rob Hubbard's](http://en.wikipedia.org/wiki/Rob_Hubbard)
-original because it's ABSOLUTELY FANTASTIC! 
+- Backend:
+  - PHP
+  - MySQL
 
- - [High Voltage SID Collection](http://www.hvsc.de/)
+## 📝 Latest Version (v0.613)
 
-All graphics are (respectfully) ripped from original R-Type arcade games by
+### New Features
+- Redesigned enemies and backgrounds
+- HD Morgana character update
+- Enhanced bullet animations
+- Individual enemy death animations
+- Updated color scheme
 
- - [http://www.retrogamezone.co.uk/rtype.htm](http://www.retrogamezone.co.uk/rtype.htm)
+### Coming Soon
+- Pre-leaderboard score display
+- Additional game features
 
-License
-=======
+## 📄 License
 
-[MIT](http://en.wikipedia.org/wiki/MIT_License) license.
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## 🤝 Contributing
+
+Contributions, issues, and feature requests are welcome! Feel free to check the issues page.
+
+## 👥 Authors
+
+- Alan Tang - Initial work and maintenance
+
+## 🙏 Acknowledgments
+
+Special thanks to all contributors and players who have helped improve the game.
 
